@@ -6,7 +6,7 @@ const dbPassword = process.env.DB_PASSWORD;
 const env = process.env.RUNTIME_ENV
 const cloudSqlSocketPath = process.env.CLOUD_SQL_SOCKET_PATH;
 
-const dbOption: Options = {
+let dbOption: Options = {
     database: 'postgres',
     username: dbUser,
     password: dbPassword,
@@ -15,8 +15,11 @@ const dbOption: Options = {
 }
 
 if (env === 'cloud_run') {
-    dbOption.dialectOptions = {
-        socketPath: cloudSqlSocketPath,
+    dbOption = {
+        ...dbOption,
+        dialectOptions: {
+            socketPath: cloudSqlSocketPath,
+        }
     }
 }
 
@@ -26,10 +29,10 @@ if (env === 'cloud_run') {
     sequelize
         .authenticate()
         .then(() => {
-            console.log("cloud sql connection has been established successfully.");
+            console.log('cloud sql connection has been established successfully.');
         })
         .catch((err) => {
-            console.error("Unable to connect to the cloud sql database:", err);
+            console.error(`Unable to connect to the cloud sql with socket path ${cloudSqlSocketPath}:`, err);
         });
 }
 
