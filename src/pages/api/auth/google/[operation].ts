@@ -8,14 +8,24 @@ import Google, {
 } from 'passport-google-oauth'
 
 import userAccountService from '@/lib/service/UserAccountService'
+import _ from 'lodash'
+
+const oauthGoogleClientId = process.env.GOOGLE_CLIENT_ID ?? ''
+const oauthGoogleClientSecret = process.env.GOOGLE_CLIENT_SECRET ?? ''
+const oauthGoogleCallbackUrl = process.env.GOOGLE_CALLBACK_URL ?? ''
+
+if (_.isEmpty(oauthGoogleClientId) || _.isEmpty(oauthGoogleClientSecret) || _.isEmpty(oauthGoogleCallbackUrl)) {
+  console.error('Missing environment variables: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL')
+}
+
+const googleOAuth2Options: IOAuth2StrategyOption = {
+  clientID: oauthGoogleClientId,
+  clientSecret: oauthGoogleClientSecret,
+  callbackURL: oauthGoogleCallbackUrl
+}
 
 passport.use(
-  new Google.OAuth2Strategy(
-    {
-      clientID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.NEXT_PUBLIC_GOOGLE_CALLBACK_URL
-    } as IOAuth2StrategyOption,
+  new Google.OAuth2Strategy(googleOAuth2Options,
     (
       accessToken: string,
       refreshToken: string,
@@ -40,17 +50,17 @@ router.get((req, res, next) => {
     return passport.authenticate(
       'google',
       async (err: any, profile: any, info: any) => {
-        if (err) {
+        if (!_.isEmpty(err)) {
           res.status(500).end()
           return
         }
 
         console.log(profile)
-        const userEmail = profile.emails[0].value;
+        const userEmail = profile.emails[0].value
         const googleUser = await userAccountService.registerUserByGoogle({
           email: userEmail,
-          name: "test",
-          avatar: "test"
+          name: 'test',
+          avatar: 'test'
         })
         res.json(googleUser)
         // res.setHeader('Set-Cookie', cookie)
@@ -65,6 +75,6 @@ router.get((req, res, next) => {
 export default router.handler({
   onError: (err: any, req: any, res: any) => {
     console.error(err.stack)
-    res.status(err.statusCode || 500).end(err.message)
+    res.status(err.statusCode ?? 500).end(err.message)
   }
 })

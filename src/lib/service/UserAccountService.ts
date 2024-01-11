@@ -21,7 +21,7 @@ class UserAccountService {
       }
     })
 
-    if (existingUser) {
+    if (existingUser != null) {
       throw new ApplicationError(400, 'User already exists')
     }
 
@@ -60,11 +60,11 @@ class UserAccountService {
       }]
     })
 
-    if (existingGoogleUser) {
-      return existingGoogleUser;
+    if (existingGoogleUser != null) {
+      return existingGoogleUser
     } else {
       return await sequelize.transaction(async t => {
-        const [user, created] = await UserAccount.findOrCreate({
+        const [user] = await UserAccount.findOrCreate({
           where: {
             email: profile.email
           },
