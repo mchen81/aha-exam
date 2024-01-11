@@ -10,9 +10,9 @@ import Google, {
 import userAccountService from '@/lib/service/UserAccountService'
 import _ from 'lodash'
 
-const oauthGoogleClientId = process.env.GOOGLE_CLIENT_ID ?? ''
-const oauthGoogleClientSecret = process.env.GOOGLE_CLIENT_SECRET ?? ''
-const oauthGoogleCallbackUrl = process.env.GOOGLE_CALLBACK_URL ?? ''
+const oauthGoogleClientId = process.env.OAUTH_GOOGLE_CLIENT_ID ?? ''
+const oauthGoogleClientSecret = process.env.OAUTH_GOOGLE_CLIENT_SECRET ?? ''
+const oauthGoogleCallbackUrl = process.env.OAUTH_GOOGLE_CALLBACK_URL ?? ''
 
 if (_.isEmpty(oauthGoogleClientId) || _.isEmpty(oauthGoogleClientSecret) || _.isEmpty(oauthGoogleCallbackUrl)) {
   console.error('Missing environment variables: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL')
