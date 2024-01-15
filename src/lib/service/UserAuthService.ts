@@ -5,19 +5,12 @@ import { isValidPassword } from '@/util/validation'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 
+import type { LoginResult } from '@/types/auth'
+
 interface GoogleAuthProfile {
   email: string
   name: string
   avatar: string
-}
-
-interface LoginResult {
-  email: string
-  username: string
-  avatar: string
-  sessionToken: string
-  provider: string
-  isVerified: boolean
 }
 
 const SALT_ROUND = 10
