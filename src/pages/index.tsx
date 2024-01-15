@@ -12,14 +12,14 @@ const LandingPage: React.FC = () => {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Link href="/user/signin" passHref>
+          <Link href="/user/login" passHref>
             <Button variant="contained" color="primary">
               Sign In
             </Button>
           </Link>
         </Grid>
         <Grid item xs={12}>
-          <Link href="/user/signup" passHref>
+          <Link href="/user/register" passHref>
             <Button variant="contained" color="secondary">
               Sign Up
             </Button>
