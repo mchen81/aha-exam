@@ -1,5 +1,5 @@
-import { type CookieSerializeOptions, serialize } from 'cookie'
-import { type NextApiResponse, type NextApiRequest } from 'next'
+import { type CookieSerializeOptions, parse, serialize } from 'cookie'
+import { type NextApiRequest, type NextApiResponse } from 'next'
 
 export const SESSION_KEY = 'session_token'
 
@@ -19,7 +19,7 @@ export const setCookieForSession = (
   res.setHeader('Set-Cookie', serialize(SESSION_KEY, sessionToken, options))
 }
 
-// export const verifyAndGetUserSessionToken = (req: NextApiRequest): string | null => {
-//
-//
-// }
+export const getSessionTokenFromCookie = (req: NextApiRequest): string | null => {
+  const cookies = parse(req.headers.cookie ?? '')
+  return cookies[SESSION_KEY]
+}
