@@ -7,8 +7,12 @@ import Google, {
   type VerifyFunction
 } from 'passport-google-oauth'
 
-import userAccountService from '@/lib/service/UserAccountService'
+import UserAuthService from '@/lib/service/UserAuthService'
+
 import _ from 'lodash'
+
+import { setCookieForSession } from '@/util/http'
+import ApplicationError from '@/lib/service/ApplicationError'
 
 const oauthGoogleClientId = process.env.OAUTH_GOOGLE_CLIENT_ID ?? ''
 const oauthGoogleClientSecret = process.env.OAUTH_GOOGLE_CLIENT_SECRET ?? ''
@@ -17,6 +21,8 @@ const oauthGoogleCallbackUrl = process.env.OAUTH_GOOGLE_CALLBACK_URL ?? ''
 if (_.isEmpty(oauthGoogleClientId) || _.isEmpty(oauthGoogleClientSecret) || _.isEmpty(oauthGoogleCallbackUrl)) {
   console.error('Missing environment variables: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL')
 }
+
+const userAuthService = UserAuthService.getInstance()
 
 const googleOAuth2Options: IOAuth2StrategyOption = {
   clientID: oauthGoogleClientId,
@@ -55,17 +61,20 @@ router.get((req, res, next) => {
           return
         }
 
-        console.log(profile)
         const userEmail = profile.emails[0].value
-        const googleUser = await userAccountService.registerUserByGoogle({
+        const username = profile.displayName
+        const avatar = profile.photos[0].value
+
+        const loginResult = await userAuthService.registerOrLoginUserByGoogle({
           email: userEmail,
-          name: 'test',
-          avatar: 'test'
+          name: username,
+          avatar
         })
-        res.json(googleUser)
-        // res.setHeader('Set-Cookie', cookie)
-        // res.redirect('/')
+
+        setCookieForSession(res, loginResult.sessionToken)
+        res.status(200).end()
       }
+
     )(req, res, next)
   } else {
     res.status(400).json({ error: 'Unknown operation.' })
@@ -74,7 +83,11 @@ router.get((req, res, next) => {
 
 export default router.handler({
   onError: (err: any, req: any, res: any) => {
-    console.error(err.stack)
-    res.status(err.statusCode ?? 500).end(err.message)
+    if (err instanceof ApplicationError) {
+      res.status(400).json({ error: err.message })
+    } else {
+      console.log(err)
+      res.status(500).json({ error: 'Internal Server Error' })
+    }
   }
 })
