@@ -5,6 +5,7 @@ import {
   type InferAttributes,
   type InferCreationAttributes,
   type CreationOptional,
+  type NonAttribute,
   Model
 } from 'sequelize'
 
@@ -16,6 +17,8 @@ export class UserAccount extends Model<InferAttributes<UserAccount>, InferCreati
   declare username: CreationOptional<string>
   declare avatar: CreationOptional<string>
   declare createdAt: Date
+  declare UserAuthentications: NonAttribute<UserAuthentication[]>
+  declare UserSessions: NonAttribute<UserSession[]>
 }
 
 export class UserAuthentication extends Model<InferAttributes<UserAuthentication>, InferCreationAttributes<UserAuthentication>> {
@@ -32,6 +35,7 @@ export class UserSession extends Model<InferAttributes<UserSession>, InferCreati
   declare userId: ForeignKey<number>
   declare sessionToken: string
   declare isActive: boolean
+  declare expireAt: Date
   declare createdAt: Date
 }
 
@@ -44,7 +48,6 @@ UserAccount.init(
     },
     email: {
       type: DataTypes.STRING(255),
-      unique: true,
       allowNull: false
     },
     username: {
@@ -66,7 +69,13 @@ UserAccount.init(
     modelName: 'UserAccount',
     tableName: 'user_account',
     timestamps: false,
-    underscored: true
+    underscored: true,
+    indexes: [
+      {
+        unique: true,
+        fields: ['email']
+      }
+    ]
   }
 )
 
@@ -134,6 +143,10 @@ UserSession.init(
       type: DataTypes.BOOLEAN,
       defaultValue: true
     },
+    expireAt: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -145,7 +158,13 @@ UserSession.init(
     modelName: 'UserSession',
     tableName: 'user_session',
     timestamps: false,
-    underscored: true
+    underscored: true,
+    indexes: [
+      {
+        unique: true,
+        fields: ['session_token']
+      }
+    ]
   }
 )
 
@@ -170,23 +189,3 @@ UserSession.belongsTo(UserAccount, {
   foreignKey: 'userId',
   onDelete: 'CASCADE'
 })
-
-async function syncDatabase (): Promise<void> {
-  try {
-    await sequelize.sync({ force: false })
-    console.log('Database synchronized successfully')
-  } catch (error) {
-    console.error('Error synchronizing database:', error)
-  }
-}
-
-void (async () => {
-  try {
-    await sequelize.authenticate()
-    console.log('Connected to the database')
-    await syncDatabase()
-    // Start your Node.js application logic here
-  } catch (error) {
-    console.error('Unable to connect to the database:', error)
-  }
-})()
