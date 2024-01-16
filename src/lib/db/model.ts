@@ -1,4 +1,4 @@
-import sequelize from './sequelize'
+import sequelize from './sequelize';
 import {
   DataTypes,
   type ForeignKey,
@@ -6,37 +6,46 @@ import {
   type InferCreationAttributes,
   type CreationOptional,
   type NonAttribute,
-  Model
-} from 'sequelize'
+  Model,
+} from 'sequelize';
 
-type AuthenticationProvider = 'local' | 'google'
+type AuthenticationProvider = 'local' | 'google';
 
-export class UserAccount extends Model<InferAttributes<UserAccount>, InferCreationAttributes<UserAccount>> {
-  declare id: CreationOptional<number>
-  declare email: string
-  declare username: CreationOptional<string>
-  declare avatar: CreationOptional<string>
-  declare createdAt: Date
-  declare UserAuthentications: NonAttribute<UserAuthentication[]>
-  declare UserSessions: NonAttribute<UserSession[]>
+export class UserAccount extends Model<
+  InferAttributes<UserAccount>,
+  InferCreationAttributes<UserAccount>
+> {
+  declare id: CreationOptional<number>;
+  declare email: string;
+  declare username: CreationOptional<string>;
+  declare avatar: CreationOptional<string>;
+  declare createdAt: Date;
+  declare UserAuthentications: NonAttribute<UserAuthentication[]>;
+  declare UserSessions: NonAttribute<UserSession[]>;
 }
 
-export class UserAuthentication extends Model<InferAttributes<UserAuthentication>, InferCreationAttributes<UserAuthentication>> {
-  declare id: CreationOptional<number>
-  declare userId: ForeignKey<number>
-  declare provider: AuthenticationProvider
-  declare authentication: string
-  declare isVerified: boolean
-  declare createdAt: Date
+export class UserAuthentication extends Model<
+  InferAttributes<UserAuthentication>,
+  InferCreationAttributes<UserAuthentication>
+> {
+  declare id: CreationOptional<number>;
+  declare userId: ForeignKey<number>;
+  declare provider: AuthenticationProvider;
+  declare authentication: string;
+  declare isVerified: boolean;
+  declare createdAt: Date;
 }
 
-export class UserSession extends Model<InferAttributes<UserSession>, InferCreationAttributes<UserSession>> {
-  declare id: CreationOptional<number>
-  declare userId: ForeignKey<number>
-  declare sessionToken: string
-  declare isActive: boolean
-  declare expireAt: Date
-  declare createdAt: Date
+export class UserSession extends Model<
+  InferAttributes<UserSession>,
+  InferCreationAttributes<UserSession>
+> {
+  declare id: CreationOptional<number>;
+  declare userId: ForeignKey<number>;
+  declare sessionToken: string;
+  declare isActive: boolean;
+  declare expireAt: Date;
+  declare createdAt: Date;
 }
 
 UserAccount.init(
@@ -44,25 +53,25 @@ UserAccount.init(
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     email: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: false,
     },
     username: {
       type: DataTypes.STRING(255),
-      allowNull: true
+      allowNull: true,
     },
     avatar: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: true,
     },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW
-    }
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     sequelize,
@@ -73,85 +82,88 @@ UserAccount.init(
     indexes: [
       {
         unique: true,
-        fields: ['email']
-      }
-    ]
+        fields: ['email'],
+      },
+    ],
   }
-)
+);
 
-UserAuthentication.init({
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: UserAccount,
-      key: 'id'
-    }
-  },
-  provider: {
-    type: DataTypes.STRING(255),
-    allowNull: false
-  },
-  authentication: {
-    type: DataTypes.STRING(255),
-    allowNull: false
-  },
-  isVerified: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false
-  },
-  createdAt: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    defaultValue: DataTypes.NOW
-  }
-}, {
-  sequelize,
-  modelName: 'UserAuthentication',
-  tableName: 'user_authentication',
-  timestamps: false,
-  underscored: true
-})
-
-UserSession.init(
+UserAuthentication.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: UserAccount,
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
-    sessionToken: {
+    provider: {
       type: DataTypes.STRING(255),
-      unique: true,
-      allowNull: false
+      allowNull: false,
     },
-    isActive: {
+    authentication: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    isVerified: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true
-    },
-    expireAt: {
-      type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      defaultValue: false,
     },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW
-    }
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    sequelize,
+    modelName: 'UserAuthentication',
+    tableName: 'user_authentication',
+    timestamps: false,
+    underscored: true,
+  }
+);
+
+UserSession.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: UserAccount,
+        key: 'id',
+      },
+    },
+    sessionToken: {
+      type: DataTypes.STRING(255),
+      unique: true,
+      allowNull: false,
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    expireAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     sequelize,
@@ -162,30 +174,30 @@ UserSession.init(
     indexes: [
       {
         unique: true,
-        fields: ['session_token']
-      }
-    ]
+        fields: ['session_token'],
+      },
+    ],
   }
-)
+);
 
 UserAccount.hasMany(UserAuthentication, {
   foreignKey: 'userId',
   foreignKeyConstraint: true,
-  onDelete: 'CASCADE'
-})
+  onDelete: 'CASCADE',
+});
 
 UserAuthentication.belongsTo(UserAccount, {
   foreignKey: 'userId',
-  onDelete: 'CASCADE'
-})
+  onDelete: 'CASCADE',
+});
 
 UserAccount.hasMany(UserSession, {
   foreignKey: 'userId',
   foreignKeyConstraint: true,
-  onDelete: 'CASCADE'
-})
+  onDelete: 'CASCADE',
+});
 
 UserSession.belongsTo(UserAccount, {
   foreignKey: 'userId',
-  onDelete: 'CASCADE'
-})
+  onDelete: 'CASCADE',
+});

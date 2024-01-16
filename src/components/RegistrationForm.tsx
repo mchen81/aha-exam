@@ -1,13 +1,16 @@
-import React from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import { TextField, Button, Grid } from '@mui/material'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
-import _ from 'lodash'
-import { useAuth } from '@/hooks/useAuth'
+import React from 'react';
+import {useForm, Controller} from 'react-hook-form';
+import {TextField, Button, Grid} from '@mui/material';
+import {yupResolver} from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import _ from 'lodash';
+import {useAuth} from '@/hooks/useAuth';
 
 const schema = yup.object().shape({
-  email: yup.string().required('Email is required').email('Invalid email format'),
+  email: yup
+    .string()
+    .required('Email is required')
+    .email('Invalid email format'),
   password: yup
     .string()
     .required('Password is required')
@@ -19,30 +22,37 @@ const schema = yup.object().shape({
   confirmPassword: yup
     .string()
     .required('Confirm Password is required')
-    .oneOf([yup.ref('password'), null], 'Passwords must match')
-})
+    .oneOf([yup.ref('password')], 'Passwords must match'),
+});
 
 interface FormValues {
-  email: string
-  password: string
-  confirmPassword: string
+  email: string;
+  password: string;
+  confirmPassword: string;
 }
 
 const RegistrationForm: React.FC = () => {
-  const auth = useAuth()
+  const auth = useAuth();
 
-  const { control, handleSubmit, formState: { errors } } = useForm<FormValues>({
-    resolver: yupResolver(schema)
-  })
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+  } = useForm<FormValues>({
+    resolver: yupResolver(schema),
+  });
 
   const onSubmit = async (data: FormValues): Promise<void> => {
-    await auth.register({
-      email: data.email,
-      password: data.password
-    }, (err: Error) => {
-      alert(err.message)
-    })
-  }
+    await auth.register(
+      {
+        email: data.email,
+        password: data.password,
+      },
+      (err: Error) => {
+        alert(err.message);
+      }
+    );
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -52,7 +62,7 @@ const RegistrationForm: React.FC = () => {
             name="email"
             control={control}
             defaultValue=""
-            render={({ field }) => (
+            render={({field}) => (
               <TextField
                 {...field}
                 label="Email"
@@ -69,7 +79,7 @@ const RegistrationForm: React.FC = () => {
             name="password"
             control={control}
             defaultValue=""
-            render={({ field }) => (
+            render={({field}) => (
               <TextField
                 {...field}
                 type="password"
@@ -87,7 +97,7 @@ const RegistrationForm: React.FC = () => {
             name="confirmPassword"
             control={control}
             defaultValue=""
-            render={({ field }) => (
+            render={({field}) => (
               <TextField
                 {...field}
                 type="password"
@@ -107,7 +117,7 @@ const RegistrationForm: React.FC = () => {
         </Grid>
       </Grid>
     </form>
-  )
-}
+  );
+};
 
-export default RegistrationForm
+export default RegistrationForm;

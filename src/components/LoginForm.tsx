@@ -1,30 +1,33 @@
-import React from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import Link from 'next/link'
-import { TextField, Button, Grid, Typography } from '@mui/material'
-import { useAuth } from '@/hooks/useAuth'
+import React from 'react';
+import {useForm, Controller} from 'react-hook-form';
+import Link from 'next/link';
+import {TextField, Button, Grid, Typography} from '@mui/material';
+import {useAuth} from '@/hooks/useAuth';
 
 interface FormValues {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 const LoginForm: React.FC = () => {
-  const { control, handleSubmit } = useForm<FormValues>()
-  const auth = useAuth()
+  const {control, handleSubmit} = useForm<FormValues>();
+  const auth = useAuth();
 
   const onSubmit = async (data: FormValues): Promise<void> => {
-    await auth.login({
-      email: data.email,
-      password: data.password
-    }, (err: Error) => {
-      alert(err.message)
-    })
-  }
+    await auth.login(
+      {
+        email: data.email,
+        password: data.password,
+      },
+      (err: Error) => {
+        alert(err.message);
+      }
+    );
+  };
 
   const onGoogleSignIn = async (): Promise<void> => {
-    await auth.googleAuth()
-  }
+    await auth.googleAuth();
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -34,7 +37,7 @@ const LoginForm: React.FC = () => {
             name="email"
             control={control}
             defaultValue=""
-            render={({ field }) => (
+            render={({field}) => (
               <TextField
                 {...field}
                 label="Email"
@@ -49,7 +52,7 @@ const LoginForm: React.FC = () => {
             name="password"
             control={control}
             defaultValue=""
-            render={({ field }) => (
+            render={({field}) => (
               <TextField
                 {...field}
                 type="password"
@@ -70,15 +73,14 @@ const LoginForm: React.FC = () => {
           </Button>
         </Grid>
         <Grid item xs={12}>
-
           <Typography variant="body2">
-            { "Don't have an account?" }
+            {"Don't have an account?"}
             <Link href="/user/register">Register here</Link>
           </Typography>
         </Grid>
       </Grid>
     </form>
-  )
-}
+  );
+};
 
-export default LoginForm
+export default LoginForm;
