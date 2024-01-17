@@ -1,6 +1,11 @@
+/**
+ * @fileoverview A component that prevent un-loggin users from accessing auth required resources
+ */
+
 import React, {type ReactNode, type ReactElement, useEffect} from 'react';
 import {useRouter} from 'next/router';
 import {useAuth} from '@/hooks/useAuth';
+import {LOCAL_STORAGE_KEY} from '@/util/constants';
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -17,7 +22,10 @@ const AuthGuard = (props: AuthGuardProps): ReactElement => {
       return;
     }
 
-    if (auth.user === null && !window.localStorage.getItem('user')) {
+    if (
+      auth.user === null &&
+      !window.localStorage.getItem(LOCAL_STORAGE_KEY.user)
+    ) {
       if (router.asPath !== '/') {
         void router.replace({
           pathname: '/user/login',

@@ -4,8 +4,7 @@ import axios from 'axios';
 
 import {type UserAccountDataType} from '@/types/user';
 import _ from 'lodash';
-
-const LOCAL_KEY_USER_DATA = 'user';
+import {LOCAL_STORAGE_KEY} from '@/util/constants';
 
 const apiPath = {
   login: '/api/auth/login',
@@ -106,7 +105,7 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
           }
         })
         .catch(() => {
-          localStorage.removeItem(LOCAL_KEY_USER_DATA);
+          localStorage.removeItem(LOCAL_STORAGE_KEY.user);
           setUser(null);
         })
         .finally(() => {
@@ -129,7 +128,7 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
           const data: UserAccountDataType = response.data;
           setUser(data);
           const dataJson = JSON.stringify(data);
-          window.localStorage.setItem(LOCAL_KEY_USER_DATA, dataJson);
+          window.localStorage.setItem(LOCAL_STORAGE_KEY.user, dataJson);
 
           let redirectURL = !_.isEmpty(returnUrl) ? returnUrl : '/';
           if (!data.isVerified) {
@@ -150,7 +149,7 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
     setUser(null);
     setIsInitialized(false);
     await axios.post(apiPath.logout);
-    window.localStorage.removeItem(LOCAL_KEY_USER_DATA);
+    window.localStorage.removeItem(LOCAL_STORAGE_KEY.user);
     void router.push(pageUrl.login);
   };
 
