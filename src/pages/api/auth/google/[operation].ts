@@ -14,27 +14,14 @@ import _ from 'lodash';
 
 import {setCookieForSession} from '@/util/http';
 import ApplicationError from '@/lib/service/ApplicationError';
-
-const oauthGoogleClientId = process.env.OAUTH_GOOGLE_CLIENT_ID ?? '';
-const oauthGoogleClientSecret = process.env.OAUTH_GOOGLE_CLIENT_SECRET ?? '';
-const oauthGoogleCallbackUrl = process.env.OAUTH_GOOGLE_CALLBACK_URL ?? '';
-
-if (
-  _.isEmpty(oauthGoogleClientId) ||
-  _.isEmpty(oauthGoogleClientSecret) ||
-  _.isEmpty(oauthGoogleCallbackUrl)
-) {
-  console.error(
-    'Missing environment variables: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL'
-  );
-}
+import config from '@/util/config';
 
 const userAuthService = UserAuthService.getInstance();
 
 const googleOAuth2Options: IOAuth2StrategyOption = {
-  clientID: oauthGoogleClientId,
-  clientSecret: oauthGoogleClientSecret,
-  callbackURL: oauthGoogleCallbackUrl,
+  clientID: config.oauthGoogleClientId,
+  clientSecret: config.oauthGoogleClientSecret,
+  callbackURL: config.oauthGoogleCallbackUrl,
 };
 
 passport.use(

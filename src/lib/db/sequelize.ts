@@ -1,26 +1,19 @@
 import {Sequelize, type Options} from 'sequelize';
-
-const database = process.env.DB_NAME;
-const dbHost = process.env.DB_HOST;
-const dbUser = process.env.DB_USER;
-const dbPassword = process.env.DB_PASSWORD;
-
-const env = process.env.RUNTIME_ENV;
-const cloudSqlSocketPath = process.env.CLOUD_SQL_SOCKET_PATH;
+import config from '@/util/config';
 
 let dbOption: Options = {
-  database,
-  username: dbUser,
-  password: dbPassword,
-  host: dbHost,
+  database: config.dbName,
+  username: config.dbUser,
+  password: config.dbPassword,
+  host: config.dbHost,
   dialect: 'mysql',
 };
 
-if (env === 'cloud_run') {
+if (config.runtimeEnv === 'cloud_run') {
   dbOption = {
     ...dbOption,
     dialectOptions: {
-      socketPath: cloudSqlSocketPath,
+      socketPath: config.cloudSqlSocketPath,
     },
   };
 }
@@ -34,7 +27,7 @@ sequelize
   })
   .catch(err => {
     console.error(
-      `Unable to connect to the cloud sql with socket path ${cloudSqlSocketPath}:`,
+      `Unable to connect to the cloud sql with socket path ${config.cloudSqlSocketPath}:`,
       err
     );
   });
