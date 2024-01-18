@@ -3,7 +3,7 @@ import {UserAccount, UserAuthentication, UserSession} from '@/db/model';
 import sequelize from '@/db/sequelize';
 import {isValidPassword} from '@/util/validation';
 import bcrypt from 'bcrypt';
-import crypto from 'crypto';
+import randomstring from 'randomstring';
 
 import type {LoginResult} from '@/types/auth';
 
@@ -274,7 +274,11 @@ class UserAuthService {
   }
 }
 
-function generationSessionToken(length = 48): string {
-  return crypto.randomBytes(length).toString('hex');
+function generationSessionToken(length = 200): string {
+  return randomstring.generate({
+    length: length,
+    charset: 'alphanumeric ',
+  });
 }
+
 export default UserAuthService;
