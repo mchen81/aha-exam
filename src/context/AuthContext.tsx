@@ -11,11 +11,10 @@ const apiPath = {
   register: '/api/auth/register',
   logout: '/api/auth/logout',
   googleAuth: '/api/auth/google/auth',
-  me: '/api/user',
+  me: '/api/user/me',
 };
 
 const pageUrl = {
-  verify: '/user/verify',
   waitVerify: '/user/wait-verify',
   login: '/user/login',
 };
@@ -165,7 +164,7 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
             errorCallback(new Error(res.data.error));
           }
         } else {
-          void router.push(pageUrl.verify);
+          void router.push(pageUrl.waitVerify);
         }
       })
       .catch((err: Error) => {
@@ -192,19 +191,6 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
           errorCallback(new Error(err.message));
         }
       });
-  };
-
-  const values = {
-    user,
-    loading,
-    setUser,
-    setLoading,
-    isInitialized,
-    setIsInitialized,
-    login: handleLogin,
-    logout: handleLogout,
-    register: handleRegister,
-    googleAuth: handleGoogleAuth,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
