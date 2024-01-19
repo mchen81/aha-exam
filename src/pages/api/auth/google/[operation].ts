@@ -75,7 +75,7 @@ router.get((req, res, next) => {
         });
 
         setCookieForSession(res, loginResult.sessionToken);
-        res.status(200).end();
+        res.redirect('/app/dashboard');
       }
     )(req, res, next);
   } else {
