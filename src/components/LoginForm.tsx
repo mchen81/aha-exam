@@ -25,10 +25,6 @@ const LoginForm: React.FC = () => {
     );
   };
 
-  const onGoogleSignIn = async (): Promise<void> => {
-    await auth.googleAuth();
-  };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={2}>
@@ -67,10 +63,10 @@ const LoginForm: React.FC = () => {
           <Button type="submit" variant="contained" color="primary">
             Sign In
           </Button>
-          {/* Google Login Button (You need to implement this separately) */}
-          <Button variant="contained" onClick={onGoogleSignIn}>
-            Google Sign In
-          </Button>
+
+          <Link href="/api/auth/google/auth">
+            <Button variant="contained">Google Sign In</Button>
+          </Link>
         </Grid>
         <Grid item xs={12}>
           <Typography variant="body2">

@@ -45,7 +45,6 @@ export interface AuthValuesType {
     params: RegisterParams,
     errorCallback?: ErrCallbackType
   ) => Promise<void>;
-  googleAuth: () => Promise<void>;
 }
 
 const defaultProvider: AuthValuesType = {
@@ -62,9 +61,6 @@ const defaultProvider: AuthValuesType = {
   },
   setIsInitialized: () => Boolean,
   register: async () => {
-    await Promise.resolve();
-  },
-  googleAuth: async () => {
     await Promise.resolve();
   },
 };
@@ -174,25 +170,6 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
       });
   };
 
-  const handleGoogleAuth = async (
-    errorCallback?: ErrCallbackType
-  ): Promise<void> => {
-    await axios
-      .get(apiPath.googleAuth)
-      .then(res => {
-        if (res.data?.error) {
-          if (errorCallback !== undefined) {
-            errorCallback(res.data.error);
-          }
-        }
-      })
-      .catch((err: Error) => {
-        if (errorCallback !== undefined) {
-          errorCallback(new Error(err.message));
-        }
-      });
-  };
-
   const values = {
     user,
     loading,
@@ -203,7 +180,6 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
     login: handleLogin,
     logout: handleLogout,
     register: handleRegister,
-    googleAuth: handleGoogleAuth,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
