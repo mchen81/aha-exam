@@ -1,7 +1,6 @@
 import type {InferGetServerSidePropsType, GetServerSideProps} from 'next';
 import {Container, Alert} from '@mui/material';
 import {verifyEmailVerificationToken} from '@/lib/util/jwt';
-import _ from 'lodash';
 import UserAuthService from '@/lib/service/UserAuthService';
 import ApplicationError from '@/lib/service/ApplicationError';
 const userAuthService = UserAuthService.getInstance();
