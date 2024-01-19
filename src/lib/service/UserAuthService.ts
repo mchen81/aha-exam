@@ -26,7 +26,7 @@ class UserAuthService {
     return instance;
   }
 
-  async registerUserByPassword(email: string, password: string) {
+  async registerUserByPassword(email: string, password: string): Promise<void> {
     if (!isValidPassword(password)) {
       throw new ApplicationError(400, 'Invalid Password');
     }
@@ -42,10 +42,8 @@ class UserAuthService {
     }
 
     const hashedPassword = bcrypt.hashSync(password, SALT_ROUND);
-    console.log(hashedPassword);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const user = sequelize.transaction(async t => {
+    await sequelize.transaction(async t => {
       const user = await UserAccount.create(
         {
           email,
@@ -67,8 +65,6 @@ class UserAuthService {
 
       return user;
     });
-
-    // TODO send verification email
   }
 
   async registerOrLoginUserByGoogle(
@@ -242,6 +238,10 @@ class UserAuthService {
   }
 
   async getUserBySessionToken(sessionToken: string) {
+    if (sessionToken === null || sessionToken === undefined) {
+      throw new ApplicationError(400, 'Session token is not provided');
+    }
+
     const userSession = await UserSession.findOne({
       where: {
         sessionToken,
@@ -260,11 +260,7 @@ class UserAuthService {
       throw new ApplicationError(400, 'Session has expired');
     }
 
-    const user = await UserAccount.findOne({
-      where: {
-        id: userSession.userId,
-      },
-    });
+    const user = await UserAccount.findByPk(userSession.userId);
 
     if (user === null) {
       throw new ApplicationError(400, 'User not found');
@@ -272,12 +268,41 @@ class UserAuthService {
 
     return user;
   }
+
+  async verifyUserEmail(email: string): Promise<void> {
+    const user = await UserAccount.findOne({
+      where: {
+        email,
+      },
+      include: [
+        {
+          model: UserAuthentication,
+          where: {
+            provider: 'local',
+          },
+          required: true,
+        },
+      ],
+    });
+
+    if (user === null) {
+      throw new ApplicationError(404, 'User not found');
+    }
+
+    const userAuth: UserAuthentication = user.UserAuthentications[0];
+    if (userAuth.isVerified) {
+      return;
+    }
+
+    userAuth.isVerified = true;
+    await userAuth.save();
+  }
 }
 
 function generationSessionToken(length = 200): string {
   return randomstring.generate({
     length: length,
-    charset: 'alphanumeric ',
+    charset: 'alphanumeric',
   });
 }
 

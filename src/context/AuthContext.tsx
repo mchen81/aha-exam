@@ -193,6 +193,19 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
       });
   };
 
+  const values = {
+    user,
+    loading,
+    setUser,
+    setLoading,
+    isInitialized,
+    setIsInitialized,
+    login: handleLogin,
+    logout: handleLogout,
+    register: handleRegister,
+    googleAuth: handleGoogleAuth,
+  };
+
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
 };
 

@@ -10,6 +10,7 @@ const SYSTEM_CONFIG = {
   oauthGoogleCallbackUrl: process.env.OAUTH_GOOGLE_CALLBACK_URL || '',
   sendgridAPIKey: process.env.SENDGRID_API_KEY || '',
   emailAuthSecret: process.env.EMAIL_AUTH_SECRET || '',
+  serverHost: process.env.SERVER_HOST || '',
 };
 
 for (const [key, value] of Object.entries(SYSTEM_CONFIG)) {
