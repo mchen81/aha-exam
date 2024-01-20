@@ -1,8 +1,17 @@
 import ApplicationError from './ApplicationError';
 import {UserAccount, UserAuthentication, UserSession} from '@/db/model';
 import {type UserAccountDataType} from '@/types/user';
+import sequelize from 'sequelize';
 
 let instance: UserAccountService;
+
+interface LoginInfo {
+  email: string;
+  signupTimestamp: number;
+  loginCount: number;
+  lastSessionTimestamp: number;
+}
+
 class UserAccountService {
   static getInstance(): UserAccountService {
     if (instance === undefined) {
@@ -61,6 +70,75 @@ class UserAccountService {
       provider: userAuth.provider,
       lastLoginAt,
     };
+  }
+
+  async getAllUsersLoginInfo(): Promise<LoginInfo[]> {
+    const result = (await UserAccount.findAll({
+      attributes: [
+        [sequelize.col('UserAccount.email'), 'email'],
+        [sequelize.col('UserAccount.created_at'), 'signupTimestamp'], // Timestamp of user sign up
+        [sequelize.fn('COUNT', sequelize.col('UserSessions.id')), 'loginCount'], // Number of times logged in
+        [
+          sequelize.fn('MAX', sequelize.col('UserSessions.created_at')),
+          'lastSessionTimestamp',
+        ], // Timestamp of the last user session
+      ],
+      include: [
+        {
+          model: UserSession,
+          attributes: [],
+          required: false, // Use LEFT JOIN to include all users even if they have no sessions
+        },
+      ],
+      group: ['UserAccount.id'], // Group by user account to get counts per user
+      raw: true, // Return raw data
+    })) as unknown;
+
+    return result as LoginInfo[];
+  }
+
+  async getUserCount(): Promise<number> {
+    const reuslt = await UserAccount.count();
+    return reuslt;
+  }
+
+  async getActiveUserInDay() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return await UserSession.findAndCountAll({
+      distinct: true, // Count only unique users
+      where: {
+        isActive: true,
+        createdAt: {
+          [sequelize.Op.gte]: today, // Sessions created today
+        },
+      },
+    })
+      .then(({count}) => {
+        return count;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
+
+  async getAverageActiveSessionUsers(rollingDays: number = 7) {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - rollingDays);
+    const reuslt: number = await UserSession.findAndCountAll({
+      distinct: true, // Count only unique users
+      where: {
+        isActive: true,
+        createdAt: {
+          [sequelize.Op.gte]: sevenDaysAgo, // Sessions created in the last 7 days
+        },
+      },
+    }).then(({count}) => {
+      return count;
+    });
+
+    return reuslt / rollingDays;
   }
 }
 
