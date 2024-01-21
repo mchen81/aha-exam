@@ -6,17 +6,66 @@ import {setCookieForSession} from '@/util/http';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 const userAuthService = UserAuthService.getInstance();
+
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     tags:
+ *       - auth
+ *     summary: Login with email and password
+ *     description: Use this endpoint to authenticate a user with their email and password.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The user's email address.
+ *               password:
+ *                 type: string
+ *                 description: The user's password.
+ *     responses:
+ *       200:
+ *         description: Successful login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/login-result'
+ *         headers:
+ *           Set-Cookie:
+ *             schema:
+ *               type: string
+ *               example: session_token=abcde12345; Path=/; HttpOnly
+ *       400:
+ *         description: email or password are not correct
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
+ *
+ */
+
 router.post(async (req, res) => {
   const {email, password} = req.body;
   const loginResult = await userAuthService.loginByPassword(email, password);
   setCookieForSession(res, loginResult.sessionToken);
-  res.status(200).json({});
+  res.status(200).json({loginResult});
 });
 
 export default router.handler({
   onError: (err: unknown, req: NextApiRequest, res: NextApiResponse) => {
     if (err instanceof ApplicationError) {
-      res.status(400).json({error: err.message});
+      res.status(err.code).json({error: err.message});
     } else {
       console.log(err);
       res.status(500).json({error: 'Internal Server Error'});

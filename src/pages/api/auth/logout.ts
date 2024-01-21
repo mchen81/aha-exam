@@ -6,6 +6,41 @@ import {getSessionTokenFromCookie, setCookieForSession} from '@/util/http';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 const userAuthService = UserAuthService.getInstance();
+
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     tags:
+ *       - auth
+ *     summary: Logout a user
+ *     description: Use this endpoint to log out a user and invalidate their session.
+ *     responses:
+ *       200:
+ *         description: User logged out successfully
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating unauthorized access.
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating an internal server error.
+ *
+ */
+
 router.post(async (req, res) => {
   const sessionToken = getSessionTokenFromCookie(req);
   if (sessionToken === null) {
@@ -19,7 +54,7 @@ router.post(async (req, res) => {
 export default router.handler({
   onError: (err: unknown, req: NextApiRequest, res: NextApiResponse) => {
     if (err instanceof ApplicationError) {
-      res.status(400).json({error: err.message});
+      res.status(err.code).json({error: err.message});
     } else {
       console.log(err);
       res.status(500).json({error: 'Internal Server Error'});

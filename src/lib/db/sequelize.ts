@@ -20,6 +20,8 @@ if (config.runtimeEnv === 'cloud_run') {
 
 const sequelize = new Sequelize(dbOption);
 
+// sequelize.sync({force: true});
+
 sequelize
   .authenticate()
   .then(() => {

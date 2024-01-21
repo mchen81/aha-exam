@@ -38,6 +38,28 @@ passport.use(
   )
 );
 
+/**
+ * @swagger
+ * /api/auth/google/auth:
+ *   get:
+ *     tags:
+ *       - auth
+ *     summary: Google OAUTH
+ *     description: Direct user to the google authentication page
+ *     responses:
+ *       302:
+ *         description: User logged out successfully
+ * /api/auth/google/callback:
+ *   get:
+ *     tags:
+ *       - auth
+ *     summary: Google OAUTH callback
+ *     description: OAuth 2.0 authorization with Google
+ *     responses:
+ *       302:
+ *         description: Redirect to dashboard
+ */
+
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
 router.get((req, res, next) => {
@@ -86,7 +108,7 @@ router.get((req, res, next) => {
 export default router.handler({
   onError: (err: unknown, req: NextApiRequest, res: NextApiResponse) => {
     if (err instanceof ApplicationError) {
-      res.status(400).json({error: err.message});
+      res.status(err.code).json({error: err.message});
     } else {
       console.log(err);
       res.status(500).json({error: 'Internal Server Error'});

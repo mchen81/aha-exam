@@ -17,7 +17,6 @@ router.post(async (req, res) => {
   }
 
   const dataType = req.query.dataType;
-  const timezone = req.query.timezone ?? 'Asia/Taiwan';
 
   if (dataType === 'userLoginInfo') {
     await processUserLoginInfo(res);
@@ -56,7 +55,7 @@ async function processUserStatistics(res: NextApiResponse) {
 export default router.handler({
   onError: (err: unknown, req: NextApiRequest, res: NextApiResponse) => {
     if (err instanceof ApplicationError) {
-      res.status(400).json({error: err.message});
+      res.status(err.code).json({error: err.message});
     } else {
       console.log(err);
       res.status(500).json({error: 'Internal Server Error'});

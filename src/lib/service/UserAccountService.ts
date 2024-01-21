@@ -2,6 +2,7 @@ import ApplicationError from './ApplicationError';
 import {UserAccount, UserAuthentication, UserSession} from '@/db/model';
 import {type UserAccountDataType} from '@/types/user';
 import sequelize from 'sequelize';
+import _ from 'lodash';
 
 let instance: UserAccountService;
 
@@ -70,6 +71,27 @@ class UserAccountService {
       provider: userAuth.provider,
       lastLoginAt,
     };
+  }
+
+  async updateUsername(email: string, username: string): Promise<string> {
+    if (_.isEmpty(username)) {
+      throw new ApplicationError(400, 'User name cannot be empty');
+    }
+
+    const user = await UserAccount.findOne({
+      where: {
+        email,
+      },
+    });
+
+    if (user === null) {
+      throw new ApplicationError(404, 'User not found');
+    }
+
+    user.username = username;
+    await user.save();
+
+    return username;
   }
 
   async getAllUsersLoginInfo(): Promise<LoginInfo[]> {

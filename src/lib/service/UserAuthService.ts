@@ -6,6 +6,7 @@ import bcrypt from 'bcrypt';
 import randomstring from 'randomstring';
 
 import type {LoginResult} from '@/types/auth';
+import type {UserAccountDataType} from '@/types/user';
 
 interface GoogleAuthProfile {
   email: string;
@@ -14,7 +15,7 @@ interface GoogleAuthProfile {
 }
 
 const SALT_ROUND = 10;
-const SESSION_EXPIRE = 1000 * 60 * 60 * 24 * 7; // 7D
+const SESSION_EXPIRE = 1000 * 60 * 60 * 24 * 30; // 30D
 
 let instance: UserAuthService;
 
@@ -237,7 +238,9 @@ class UserAuthService {
     await userAuth.save();
   }
 
-  async getUserBySessionToken(sessionToken: string) {
+  async getUserBySessionToken(
+    sessionToken: string
+  ): Promise<UserAccountDataType> {
     if (sessionToken === null || sessionToken === undefined) {
       throw new ApplicationError(400, 'Session token is not provided');
     }
@@ -260,13 +263,29 @@ class UserAuthService {
       throw new ApplicationError(400, 'Session has expired');
     }
 
-    const user = await UserAccount.findByPk(userSession.userId);
+    const user = await UserAccount.findOne({
+      where: {id: userSession.userId},
+      include: [
+        {
+          model: UserAuthentication,
+        },
+      ],
+    });
 
     if (user === null) {
       throw new ApplicationError(400, 'User not found');
     }
 
-    return user;
+    const userAuth = user.UserAuthentications[0];
+
+    return {
+      email: user.email,
+      username: user.username,
+      avatar: user.avatar,
+      createdAt: user.createdAt,
+      isVerified: userAuth.isVerified,
+      provider: userAuth.provider,
+    };
   }
 
   async verifyUserEmail(email: string): Promise<void> {
@@ -286,7 +305,7 @@ class UserAuthService {
     });
 
     if (user === null) {
-      throw new ApplicationError(404, 'User not found');
+      throw new ApplicationError(400, 'User not found');
     }
 
     const userAuth: UserAuthentication = user.UserAuthentications[0];

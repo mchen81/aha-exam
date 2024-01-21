@@ -5,5 +5,5 @@ export interface UserAccountDataType {
   createdAt: Date;
   isVerified: boolean;
   provider: string;
-  lastLoginAt: Date;
+  lastLoginAt?: Date;
 }

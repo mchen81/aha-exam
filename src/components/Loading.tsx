@@ -1,6 +1,6 @@
 import React from 'react';
 const Loading = () => {
-  return <> Please wait a moment, we are sign you in... </>;
+  return <> </>;
 };
 
 export default Loading;

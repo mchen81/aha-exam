@@ -1,8 +1,12 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Button, Container, Grid, Typography} from '@mui/material';
 import Link from 'next/link';
 
 const LandingPage: React.FC = () => {
+  useEffect(() => {
+    console.log(new Date());
+  }, []);
+
   return (
     <Container maxWidth="sm">
       <Grid
