@@ -72,11 +72,9 @@ router.put(async (req, res) => {
   }
 
   const username = req.body.username;
-  if (_.isEmpty(username)) {
-    res.status(400).json({error: 'Username cannot be empty'});
-  }
+
   const user = await userAuthService.getUserBySessionToken(sessionToken);
-  await userAccountService.updateUsername(user.email, username);
+  await userAccountService.updateUsername(user.email, username ?? '');
 
   res.status(200).json({message: 'SUCCESS'});
 });

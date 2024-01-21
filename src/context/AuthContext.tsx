@@ -46,6 +46,7 @@ export interface AuthValuesType {
     params: RegisterParams,
     errorCallback?: ErrCallbackType
   ) => Promise<void>;
+  reloadUser: () => Promise<void>;
 }
 
 const defaultProvider: AuthValuesType = {
@@ -62,6 +63,9 @@ const defaultProvider: AuthValuesType = {
   },
   setIsInitialized: () => Boolean,
   register: async () => {
+    await Promise.resolve();
+  },
+  reloadUser: async () => {
     await Promise.resolve();
   },
 };
@@ -171,6 +175,23 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
       });
   };
 
+  const handleReloadUser = async (): Promise<void> => {
+    await axios
+      .get(apiPath.me)
+      .then(async response => {
+        const user: UserAccountDataType = response.data;
+        setUser(user);
+        if (!user.isVerified) {
+          void router.push(pageUrl.waitVerify);
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem(LOCAL_STORAGE_KEY.user);
+        setUser(null);
+        void router.push(pageUrl.home);
+      });
+  };
+
   const values = {
     user,
     loading,
@@ -181,6 +202,7 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
     login: handleLogin,
     logout: handleLogout,
     register: handleRegister,
+    reloadUser: handleReloadUser,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

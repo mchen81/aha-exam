@@ -7,3 +7,10 @@ export interface UserAccountDataType {
   provider: string;
   lastLoginAt?: Date;
 }
+
+export interface LoginInfo {
+  email: string;
+  signupTimestamp: number;
+  loginCount: number;
+  lastSessionTimestamp: number;
+}

@@ -1,37 +1,17 @@
 import React from 'react';
-import {Container, Grid, Typography, Button} from '@mui/material';
+import {Container} from '@mui/material';
 import AuthGuard from '@/components/AuthGuard';
 import Loading from '@/components/Loading';
-import {useAuth} from '@/hooks/useAuth';
+import NavBar from '@/components/NavBar';
+import UserStatisticsTable from '@/components/UserStatisticsTable';
 
 const Dashboard: React.FC = () => {
-  const auth = useAuth();
-
   return (
     <AuthGuard fallback={<Loading />}>
-      <Container maxWidth="sm">
-        <Grid
-          container
-          spacing={3}
-          justifyContent="center"
-          alignItems="center"
-          style={{minHeight: '100vh'}}
-        >
-          <Grid item xs={12}>
-            <Typography variant="h4" gutterBottom>
-              I am dashboard!
-            </Typography>
+      <NavBar />
 
-            <Button
-              variant={'outlined'}
-              onClick={async () => {
-                await auth.logout();
-              }}
-            >
-              logout
-            </Button>
-          </Grid>
-        </Grid>
+      <Container>
+        <UserStatisticsTable />
       </Container>
     </AuthGuard>
   );

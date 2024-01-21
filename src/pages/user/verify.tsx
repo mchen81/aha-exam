@@ -1,8 +1,9 @@
 import type {InferGetServerSidePropsType, GetServerSideProps} from 'next';
-import {Container, Alert} from '@mui/material';
+import {Container, Alert, Typography} from '@mui/material';
 import {verifyEmailVerificationToken} from '@/lib/util/jwt';
 import UserAuthService from '@/lib/service/UserAuthService';
 import ApplicationError from '@/lib/service/ApplicationError';
+import Link from 'next/link';
 const userAuthService = UserAuthService.getInstance();
 
 export default function Page({
@@ -21,6 +22,10 @@ export default function Page({
   return (
     <Container maxWidth="sm">
       <Alert severity="success">Your email address has been verified.</Alert>
+      <br />
+      <Link href="/user/login">
+        <Typography>Go to Login Page</Typography>
+      </Link>
     </Container>
   );
 }

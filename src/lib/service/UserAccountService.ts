@@ -1,17 +1,10 @@
 import ApplicationError from './ApplicationError';
 import {UserAccount, UserAuthentication, UserSession} from '@/db/model';
-import {type UserAccountDataType} from '@/types/user';
+import {type UserAccountDataType, type LoginInfo} from '@/types/user';
 import sequelize from 'sequelize';
 import _ from 'lodash';
 
 let instance: UserAccountService;
-
-interface LoginInfo {
-  email: string;
-  signupTimestamp: number;
-  loginCount: number;
-  lastSessionTimestamp: number;
-}
 
 class UserAccountService {
   static getInstance(): UserAccountService {
