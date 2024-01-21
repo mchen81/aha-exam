@@ -99,7 +99,7 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
           const user: UserAccountDataType = response.data;
           setUser(user);
           if (!user.isVerified) {
-            void router.push(pageUrl.waitVerify);
+            router.push(pageUrl.waitVerify);
           }
         })
         .catch(() => {
@@ -121,7 +121,7 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
     await axios
       .post(apiPath.login, params)
       .then(() => {
-        void axios.get(apiPath.me).then(async response => {
+        axios.get(apiPath.me).then(async response => {
           const returnUrl = router.query.returnUrl;
           const data: UserAccountDataType = response.data;
           setUser(data);
@@ -138,7 +138,11 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
       })
       .catch((err: Error) => {
         if (errorCallback !== undefined) {
-          errorCallback(new Error(err.message));
+          if (err instanceof axios.AxiosError) {
+            errorCallback(new Error(err.response?.data.error));
+          } else {
+            errorCallback(new Error(err.message));
+          }
         }
       });
   };
@@ -170,7 +174,11 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
       })
       .catch((err: Error) => {
         if (errorCallback !== undefined) {
-          errorCallback(new Error(err.message));
+          if (err instanceof axios.AxiosError) {
+            errorCallback(new Error(err.response?.data.error));
+          } else {
+            errorCallback(new Error(err.message));
+          }
         }
       });
   };
@@ -182,13 +190,13 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
         const user: UserAccountDataType = response.data;
         setUser(user);
         if (!user.isVerified) {
-          void router.push(pageUrl.waitVerify);
+          router.push(pageUrl.waitVerify);
         }
       })
       .catch(() => {
         localStorage.removeItem(LOCAL_STORAGE_KEY.user);
         setUser(null);
-        void router.push(pageUrl.home);
+        router.push(pageUrl.home);
       });
   };
 

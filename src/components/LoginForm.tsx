@@ -3,6 +3,7 @@ import {useForm, Controller} from 'react-hook-form';
 import Link from 'next/link';
 import {TextField, Button, Grid, Typography, Stack} from '@mui/material';
 import {useAuth} from '@/hooks/useAuth';
+import {toast} from 'react-toastify';
 
 interface FormValues {
   email: string;
@@ -20,7 +21,7 @@ const LoginForm: React.FC = () => {
         password: data.password,
       },
       (err: Error) => {
-        alert(err.message);
+        toast.error(err.message);
       }
     );
   };

@@ -5,6 +5,7 @@ import {yupResolver} from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import _ from 'lodash';
 import {useAuth} from '@/hooks/useAuth';
+import {toast} from 'react-toastify';
 
 const schema = yup.object().shape({
   email: yup
@@ -49,7 +50,7 @@ const RegistrationForm: React.FC = () => {
         password: data.password,
       },
       (err: Error) => {
-        alert(err.message);
+        toast.error(err.message);
       }
     );
   };

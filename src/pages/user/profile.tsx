@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
@@ -16,7 +16,6 @@ const Dashboard: React.FC = () => {
   const [resetPassword, setResetPassword] = useState(false);
 
   const auth = useAuth();
-  useEffect(() => {}, []);
 
   return (
     <AuthGuard fallback={<Loading />}>

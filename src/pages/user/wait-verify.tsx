@@ -3,6 +3,7 @@ import {Container, Alert, Button, Typography} from '@mui/material';
 import {useAuth} from '@/hooks/useAuth';
 import {useRouter} from 'next/router';
 import axios from 'axios';
+import {toast} from 'react-toastify';
 
 const WaitVerify: React.FC = () => {
   const router = useRouter();
@@ -11,7 +12,10 @@ const WaitVerify: React.FC = () => {
 
   const onResendClick = () => {
     setResendEmail(true);
-    axios.post('/api/user/resend-verify-email');
+    axios
+      .post('/api/user/resend-verify-email')
+      .then(() => toast.success('Verification email has been resent'))
+      .catch(err => toast.error(err.response?.data?.error ?? err.message));
   };
 
   if (auth.user !== null && auth.user.isVerified) {
