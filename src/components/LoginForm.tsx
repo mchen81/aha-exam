@@ -1,7 +1,7 @@
 import React from 'react';
 import {useForm, Controller} from 'react-hook-form';
 import Link from 'next/link';
-import {TextField, Button, Grid, Typography} from '@mui/material';
+import {TextField, Button, Grid, Typography, Stack} from '@mui/material';
 import {useAuth} from '@/hooks/useAuth';
 
 interface FormValues {
@@ -60,13 +60,15 @@ const LoginForm: React.FC = () => {
           />
         </Grid>
         <Grid item xs={12}>
-          <Button type="submit" variant="contained" color="primary">
-            Sign In
-          </Button>
+          <Stack direction={'row'} spacing={2}>
+            <Button type="submit" variant="contained" color="primary">
+              Sign In
+            </Button>
 
-          <Link href="/api/auth/google/auth">
-            <Button variant="contained">Google Sign In</Button>
-          </Link>
+            <Link href="/api/auth/google/auth">
+              <Button variant="contained">Google Sign In</Button>
+            </Link>
+          </Stack>
         </Grid>
         <Grid item xs={12}>
           <Typography variant="body2">
