@@ -15,6 +15,7 @@ const apiPath = {
 };
 
 const pageUrl = {
+  home: '/',
   waitVerify: '/user/wait-verify',
   login: '/user/login',
 };
@@ -39,7 +40,7 @@ export interface AuthValuesType {
     params: LoginParams,
     errorCallback?: ErrCallbackType
   ) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: (suppressFallback?: boolean) => Promise<void>;
   setIsInitialized: (isInitialized: boolean) => void;
   register: (
     params: RegisterParams,
@@ -74,7 +75,6 @@ interface Props {
 type ErrCallbackType = (err: Error) => void;
 
 const AuthProvider = ({children}: Props): React.JSX.Element => {
-  // ** States
   const [user, setUser] = useState<UserAccountDataType | null>(
     defaultProvider.user
   );
@@ -83,7 +83,6 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
     defaultProvider.isInitialized
   );
 
-  // ** Hooks
   const router = useRouter();
 
   useEffect(() => {
@@ -140,12 +139,14 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
       });
   };
 
-  const handleLogout = async (): Promise<void> => {
+  const handleLogout = async (suppressFallback?: boolean): Promise<void> => {
     setUser(null);
     setIsInitialized(false);
     await axios.post(apiPath.logout);
     window.localStorage.removeItem(LOCAL_STORAGE_KEY.user);
-    void router.push(pageUrl.login);
+    if (!suppressFallback) {
+      router.push(pageUrl.home);
+    }
   };
 
   const handleRegister = async (
@@ -160,7 +161,7 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
             errorCallback(new Error(res.data.error));
           }
         } else {
-          void router.push(pageUrl.waitVerify);
+          router.push(pageUrl.waitVerify);
         }
       })
       .catch((err: Error) => {
