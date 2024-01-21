@@ -71,22 +71,28 @@ class UserAuthService {
   async registerOrLoginUserByGoogle(
     profile: GoogleAuthProfile
   ): Promise<LoginResult> {
-    let googleUser: UserAccount | null = await UserAccount.findOne({
+    let user: UserAccount | null = await UserAccount.findOne({
       where: {
         email: profile.email,
       },
       include: [
         {
           model: UserAuthentication,
-          where: {
-            provider: 'google',
-          },
         },
       ],
     });
 
-    if (googleUser === null) {
-      googleUser = await sequelize.transaction(async t => {
+    const userAuth = user?.UserAuthentications[0] ?? null;
+
+    if (userAuth !== null && userAuth.provider !== 'google') {
+      throw new ApplicationError(
+        400,
+        'This user is not linked with Google, please login with email/password'
+      );
+    }
+
+    if (user === null) {
+      user = await sequelize.transaction(async t => {
         const [user] = await UserAccount.findOrCreate({
           where: {
             email: profile.email,
@@ -114,9 +120,10 @@ class UserAuthService {
         return user;
       });
     }
+
     const sessionToken = generationSessionToken();
     await UserSession.create({
-      userId: googleUser.id,
+      userId: user.id,
       sessionToken,
       isActive: true,
       expireAt: new Date(Date.now() + SESSION_EXPIRE),
@@ -124,9 +131,9 @@ class UserAuthService {
     });
 
     return {
-      email: googleUser.email,
-      username: googleUser.username,
-      avatar: googleUser.avatar,
+      email: user.email,
+      username: user.username,
+      avatar: user.avatar,
       sessionToken,
       provider: 'google',
       isVerified: true,
@@ -225,7 +232,7 @@ class UserAuthService {
     if (user === null) {
       throw new ApplicationError(
         400,
-        'User is not registered with password credentials'
+        'Your account is not registered with password credentials'
       );
     }
 

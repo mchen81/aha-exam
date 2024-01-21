@@ -74,30 +74,41 @@ router.get((req, res, next) => {
       'google',
       async (err: unknown, profile: GoogleProfile) => {
         if (!_.isEmpty(err)) {
-          res.status(500).end();
+          res.redirect('/error?message=Failed to authenticate');
           return;
         }
+        try {
+          const userEmail =
+            profile.emails !== undefined ? profile.emails[0].value : null;
 
-        const userEmail =
-          profile.emails !== undefined ? profile.emails[0].value : null;
+          if (userEmail === null) {
+            throw new ApplicationError(400, 'Google oauth callback error');
+          }
 
-        if (userEmail === null) {
-          throw new ApplicationError(400, 'Google oauth callback error');
+          const username = profile.displayName;
+
+          const avatar =
+            profile.photos !== undefined ? profile.photos[0].value : undefined;
+          const loginResult = await userAuthService.registerOrLoginUserByGoogle(
+            {
+              email: userEmail,
+              name: username,
+              avatar,
+            }
+          );
+
+          setCookieForSession(res, loginResult.sessionToken);
+          res.redirect('/app/dashboard');
+        } catch (err) {
+          if (err instanceof ApplicationError) {
+            res.redirect(`/error?message=${err.message}`);
+          } else {
+            console.log(err);
+            res.redirect(
+              '/error?message=Internal Server Error, please try again later'
+            );
+          }
         }
-
-        const username = profile.displayName;
-
-        const avatar =
-          profile.photos !== undefined ? profile.photos[0].value : undefined;
-
-        const loginResult = await userAuthService.registerOrLoginUserByGoogle({
-          email: userEmail,
-          name: username,
-          avatar,
-        });
-
-        setCookieForSession(res, loginResult.sessionToken);
-        res.redirect('/app/dashboard');
       }
     )(req, res, next);
   } else {
@@ -105,13 +116,4 @@ router.get((req, res, next) => {
   }
 });
 
-export default router.handler({
-  onError: (err: unknown, req: NextApiRequest, res: NextApiResponse) => {
-    if (err instanceof ApplicationError) {
-      res.status(err.code).json({error: err.message});
-    } else {
-      console.log(err);
-      res.status(500).json({error: 'Internal Server Error'});
-    }
-  },
-});
+export default router.handler();
