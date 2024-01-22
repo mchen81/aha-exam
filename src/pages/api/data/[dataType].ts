@@ -111,7 +111,7 @@ async function processUserLoginInfo(res: NextApiResponse) {
 
 async function processUserStatistics(res: NextApiResponse, offset: number) {
   const userCountCall = userAccountService.getUserCount();
-  const activeUserTodayCall = userAccountService.getActiveUserToday();
+  const activeUserTodayCall = userAccountService.getActiveUserToday(offset);
   const averageActiveSessionUsersCall =
     userAccountService.getAverageActiveSessionUserCount(7, offset);
   await Promise.all([

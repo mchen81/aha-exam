@@ -2,7 +2,6 @@ import ApplicationError from './ApplicationError';
 import {UserAccount, UserAuthentication, UserSession} from '@/db/model';
 import {type UserAccountDataType, type LoginInfo} from '@/types/user';
 import sequelize from 'sequelize';
-import _ from 'lodash';
 
 let instance: UserAccountService;
 
@@ -141,13 +140,29 @@ class UserAccountService {
 
   /**
    * Get all active user by today (with given offset)
+   * @param offset -8 for UTC+8, 4 for UTC-4
    * @returns
    */
-  async getActiveUserToday(): Promise<number> {
+  async getActiveUserToday(offset: number): Promise<number> {
+    const utcOffset = toUtcOffset(offset);
+
     return await UserSession.findAndCountAll({
-      distinct: true,
+      attributes: [
+        [
+          sequelize.fn(
+            'COUNT',
+            sequelize.fn('DISTINCT', sequelize.col('user_id'))
+          ),
+          'active_users_count',
+        ],
+      ],
       where: {
         isActive: true,
+        createdAt: {
+          [sequelize.Op.lte]: sequelize.literal(
+            `CONVERT_TZ(NOW(), '+00:00', '${utcOffset}')`
+          ),
+        },
       },
     }).then(({count}) => {
       return count;
