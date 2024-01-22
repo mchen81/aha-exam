@@ -4,6 +4,7 @@ import AuthGuard from '@/components/AuthGuard';
 import Loading from '@/components/Loading';
 import UserStatisticsTable from '@/components/UserStatisticsTable';
 import AppBar from '@/components/AppBar';
+import UserLoginDataTable from '@/components/UserDbDataTable';
 
 const Dashboard: React.FC = () => {
   return (
@@ -11,6 +12,8 @@ const Dashboard: React.FC = () => {
       <AppBar>
         <Container>
           <UserStatisticsTable />
+          <br />
+          <UserLoginDataTable />
         </Container>
       </AppBar>
     </AuthGuard>

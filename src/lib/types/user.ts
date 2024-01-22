@@ -10,7 +10,7 @@ export interface UserAccountDataType {
 
 export interface LoginInfo {
   email: string;
-  signupTimestamp: number;
+  signupTimestamp: string;
   loginCount: number;
-  lastSessionTimestamp: number;
+  lastSessionTimestamp: string;
 }

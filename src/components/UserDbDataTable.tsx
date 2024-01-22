@@ -11,18 +11,24 @@ import Paper from '@mui/material/Paper';
 import {type LoginInfo} from '@/types/user';
 
 import axios from 'axios';
+import {toast} from 'react-toastify';
+
+function toLocalDate(dataStr: string | Date): string {
+  const date = new Date(dataStr);
+  return date.toLocaleString();
+}
 
 const UserLoginDataTable = () => {
   const [userLoginInfos, setUserLoginInfos] = useState<LoginInfo[]>([]);
 
   useEffect(() => {
     axios
-      .post('/api/data/userLoginInfo')
+      .get('/api/data/userLoginInfo')
       .then(res => {
         setUserLoginInfos(res.data);
       })
       .catch(err => {
-        console.log(err);
+        toast.error('Error fetching user login info');
       });
   }, []);
 
@@ -46,9 +52,13 @@ const UserLoginDataTable = () => {
               <TableCell component="th" scope="row">
                 {info.email}
               </TableCell>
-              <TableCell align="right">{info.signupTimestamp}</TableCell>
+              <TableCell align="right">
+                {toLocalDate(info.signupTimestamp)}
+              </TableCell>
               <TableCell align="right">{info.loginCount}</TableCell>
-              <TableCell align="right">{info.lastSessionTimestamp}</TableCell>
+              <TableCell align="right">
+                {toLocalDate(info.lastSessionTimestamp)}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

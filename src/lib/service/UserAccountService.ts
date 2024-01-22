@@ -128,19 +128,25 @@ class UserAccountService {
     });
   }
 
-  async getAverageActiveSessionUsers(rollingDays: number, offset: number) {
+  /**
+   * Average number of active session users in the last n days rolling
+   * @param rollingDays the last n days
+   * @param offset -8 for UTC+8, 4 for UTC-4
+   * @returns the average count
+   */
+  async getAverageActiveSessionUserCount(rollingDays: number, offset: number) {
     const today = new Date();
     today.setHours(today.getHours() - offset, 0, 0, 0);
 
-    const sevenDaysAgo = new Date(today);
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - rollingDays);
+    const nDaysAgo = new Date(today);
+    nDaysAgo.setDate(nDaysAgo.getDate() - rollingDays);
 
     const reuslt: number = await UserSession.findAndCountAll({
       distinct: true, // Count only unique users
       where: {
         isActive: true,
         createdAt: {
-          [sequelize.Op.gte]: sevenDaysAgo,
+          [sequelize.Op.gte]: nDaysAgo,
           [sequelize.Op.lte]: today,
         },
       },

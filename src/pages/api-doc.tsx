@@ -36,6 +36,21 @@ const schemas = {
       error: {type: 'string'},
     },
   },
+  'user-db-data': {
+    properties: {
+      email: {type: 'string'},
+      signupTimestamp: {type: 'number'},
+      loginCount: {type: 'number'},
+      lastSessionTimestamp: {type: 'number'},
+    },
+  },
+  'user-statistic': {
+    properties: {
+      userCount: {type: 'number'},
+      activeUserToday: {type: 'number'},
+      averageActiveSessionUsers: {type: 'number'},
+    },
+  },
 };
 
 function ApiDoc({spec}: InferGetStaticPropsType<typeof getStaticProps>) {
