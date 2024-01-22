@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Implementaion of the login form on the login page
+ */
+
 import React from 'react';
 import {useForm, Controller} from 'react-hook-form';
 import Link from 'next/link';

@@ -1,3 +1,7 @@
+/**
+ * @fileoverview A dashboard component that showing all users' signupTimestamp, loginCount and lastSessionTimestamp
+ */
+
 import React, {useEffect, useState} from 'react';
 
 import Table from '@mui/material/Table';
@@ -28,7 +32,7 @@ const UserLoginDataTable = () => {
         setUserLoginInfos(res.data);
       })
       .catch(err => {
-        toast.error('Error fetching user login info');
+        toast.error(err.response?.data?.error ?? err.message);
       });
   }, []);
 

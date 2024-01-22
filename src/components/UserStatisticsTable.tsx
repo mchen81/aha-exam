@@ -1,3 +1,7 @@
+/**
+ * @fileoverview A dashboard component that showing the user Statistics data
+ */
+
 import React, {useState, useEffect} from 'react';
 import Stack from '@mui/material/Stack';
 import axios from 'axios';

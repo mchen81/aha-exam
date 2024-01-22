@@ -1,3 +1,7 @@
+/**
+ * @fileoverview A profile page displaying user's email and editable name
+ */
+
 import React, {useState} from 'react';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';

@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Reset password form component
+ */
+
 import React from 'react';
 import {Grid, Typography, Button, Stack} from '@mui/material';
 import {yupResolver} from '@hookform/resolvers/yup';
