@@ -140,13 +140,21 @@ class UserAccountService {
 
   /**
    * Get all active user by today (with given offset)
+   * The session logged in before today still counts as active as long as no logout
+   *
    * @param offset -8 for UTC+8, 4 for UTC-4
-   * @returns
+   * @returns the count
    */
   async getActiveUserToday(offset: number): Promise<number> {
     const utcOffset = toUtcOffset(offset);
 
-    return await UserSession.findAndCountAll({
+    /*
+      SELECT COUNT(DISTINCT(UserSession.user_id)) AS 'active_users_count'
+      FROM aha.user_session AS UserSession
+      WHERE (DATE(CONVERT_TZ(NOW(), '+00:00', '+8:00')) >= DATE(CONVERT_TZ(UserSession.created_at, '+00:00', '+8:00')))
+      AND UserSession.is_active = true;
+    */
+    const rows = await UserSession.findAll({
       attributes: [
         [
           sequelize.fn(
@@ -158,15 +166,22 @@ class UserAccountService {
       ],
       where: {
         isActive: true,
-        createdAt: {
-          [sequelize.Op.lte]: sequelize.literal(
-            `CONVERT_TZ(NOW(), '+00:00', '${utcOffset}')`
+        [sequelize.Op.and]: [
+          sequelize.literal(
+            `DATE(CONVERT_TZ(NOW(), '+00:00', '${utcOffset}')) >= DATE(CONVERT_TZ(created_at, '+00:00', '${utcOffset}'))`
           ),
-        },
+        ],
       },
-    }).then(({count}) => {
-      return count;
     });
+
+    if (rows.length !== 1) {
+      throw new ApplicationError(
+        500,
+        `Could not calculate active user count by today with offset ${offset}`
+      );
+    }
+
+    return rows[0].get('active_users_count') as number;
   }
 
   /**
@@ -216,9 +231,7 @@ class UserAccountService {
         isActive: true,
         createdAt: {
           [sequelize.Op.gte]: sequelize.literal(
-            `CONVERT_TZ(NOW(), '+00:00', '${utcOffset}') - INTERVAL ${
-              rollingDays - 1
-            } DAY`
+            `CONVERT_TZ(NOW(), '+00:00', '${utcOffset}') - INTERVAL ${rollingDays} DAY`
           ),
           [sequelize.Op.lte]: sequelize.literal(
             `CONVERT_TZ(NOW(), '+00:00', '${utcOffset}')`
