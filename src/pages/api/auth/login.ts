@@ -3,7 +3,6 @@ import ApplicationError from '@/lib/service/ApplicationError';
 import UserAuthService from '@/lib/service/UserAuthService';
 import {createRouter} from 'next-connect';
 import {setCookieForSession} from '@/util/http';
-import _ from 'lodash';
 import {isValidEmail, isValidPassword} from '@/util/validation';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
