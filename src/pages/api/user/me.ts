@@ -62,6 +62,12 @@ const userAuthService = UserAuthService.getInstance();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/error-response'
+ *       '404':
+ *         description: The user is not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
  *       '500':
  *         description: Internal Server Error
  *         content:
@@ -79,6 +85,10 @@ router.get(async (req, res) => {
 
   const user = await userAuthService.getUserBySessionToken(sessionToken);
   const result = await userAccountService.getUserByEmail(user.email);
+
+  if (result === null) {
+    res.status(404).json({error: 'User not found'});
+  }
 
   res.status(200).json(result);
 });
