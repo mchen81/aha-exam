@@ -117,7 +117,7 @@ class UserAccountService {
     return reuslt;
   }
 
-  async getActiveUserToday() {
+  async getActiveUserToday(): Promise<number> {
     return await UserSession.findAndCountAll({
       distinct: true,
       where: {
@@ -134,7 +134,10 @@ class UserAccountService {
    * @param offset -8 for UTC+8, 4 for UTC-4
    * @returns the average count
    */
-  async getAverageActiveSessionUserCount(rollingDays: number, offset: number) {
+  async getAverageActiveSessionUserCount(
+    rollingDays: number,
+    offset: number
+  ): Promise<number> {
     const today = new Date();
     today.setHours(today.getHours() - offset, 0, 0, 0);
 

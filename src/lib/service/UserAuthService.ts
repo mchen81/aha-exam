@@ -288,7 +288,7 @@ class UserAuthService {
     };
   }
 
-  async verifyUserEmail(email: string): Promise<void> {
+  async verifyUserEmail(email: string): Promise<UserAccount> {
     const user = await UserAccount.findOne({
       where: {
         email,
@@ -310,11 +310,26 @@ class UserAuthService {
 
     const userAuth: UserAuthentication = user.UserAuthentications[0];
     if (userAuth.isVerified) {
-      return;
+      return user;
     }
 
     userAuth.isVerified = true;
     await userAuth.save();
+
+    return user;
+  }
+
+  async createSessionForAuthenticatedUser(userId: number): Promise<string> {
+    const sessionToken = generationSessionToken();
+
+    await UserSession.create({
+      userId: userId,
+      sessionToken,
+      isActive: true,
+      createdAt: new Date(),
+    });
+
+    return sessionToken;
   }
 }
 

@@ -1,9 +1,14 @@
-import type {InferGetServerSidePropsType, GetServerSideProps} from 'next';
+import type {
+  InferGetServerSidePropsType,
+  GetServerSideProps,
+  NextApiResponse,
+} from 'next';
 import {Container, Alert, Typography} from '@mui/material';
 import {verifyEmailVerificationToken} from '@/lib/util/jwt';
 import UserAuthService from '@/lib/service/UserAuthService';
 import ApplicationError from '@/lib/service/ApplicationError';
 import Link from 'next/link';
+import {setCookieForSession} from '@/util/http';
 const userAuthService = UserAuthService.getInstance();
 
 export default function Page({
@@ -30,7 +35,7 @@ export default function Page({
   );
 }
 
-export const getServerSideProps = (async ({query}) => {
+export const getServerSideProps = (async ({query, res}) => {
   const token = query.token;
   if (typeof token !== 'string') {
     return {
@@ -48,7 +53,18 @@ export const getServerSideProps = (async ({query}) => {
     if (payload.email === undefined) {
       throw new Error('Invalid token');
     }
-    await userAuthService.verifyUserEmail(payload.email);
+    const authedUser = await userAuthService.verifyUserEmail(payload.email);
+    const session = await userAuthService.createSessionForAuthenticatedUser(
+      authedUser.id
+    );
+    setCookieForSession(res as NextApiResponse, session);
+    return {
+      props: {hasError, message},
+      redirect: {
+        permanent: false,
+        destination: '/app/dashboard',
+      },
+    };
   } catch (err) {
     hasError = true;
     if (err instanceof ApplicationError) {
