@@ -1,7 +1,7 @@
 import ApplicationError from './ApplicationError';
 import {UserAccount, UserAuthentication, UserSession} from '@/db/model';
 import sequelize from '@/db/sequelize';
-import {isValidPassword} from '@/util/validation';
+import {isValidEmail, isValidPassword} from '@/util/validation';
 import bcrypt from 'bcrypt';
 import randomstring from 'randomstring';
 
@@ -27,8 +27,15 @@ class UserAuthService {
   }
 
   async registerUserByPassword(email: string, password: string): Promise<void> {
+    if (!isValidEmail(email)) {
+      throw new ApplicationError(400, 'Invalid Email');
+    }
+
     if (!isValidPassword(password)) {
-      throw new ApplicationError(400, 'Invalid Password');
+      throw new ApplicationError(
+        400,
+        'Password does not meet the requirements'
+      );
     }
 
     const existingUser = await UserAccount.findOne({
@@ -208,7 +215,10 @@ class UserAuthService {
     newPassword: string
   ): Promise<void> {
     if (!isValidPassword(newPassword)) {
-      throw new ApplicationError(400, 'Invalid New Password');
+      throw new ApplicationError(
+        400,
+        'New Password does not meet the requirements'
+      );
     }
 
     const user = await UserAccount.findOne({
