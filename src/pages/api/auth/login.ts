@@ -3,6 +3,8 @@ import ApplicationError from '@/lib/service/ApplicationError';
 import UserAuthService from '@/lib/service/UserAuthService';
 import {createRouter} from 'next-connect';
 import {setCookieForSession} from '@/util/http';
+import _ from 'lodash';
+import {isValidEmail, isValidPassword} from '@/util/validation';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 const userAuthService = UserAuthService.getInstance();
@@ -56,6 +58,11 @@ const userAuthService = UserAuthService.getInstance();
 
 router.post(async (req, res) => {
   const {email, password} = req.body;
+  if (isValidEmail(email) || isValidPassword(password)) {
+    res.status(400).json({error: 'Invalid email or password'});
+    return;
+  }
+
   const loginResult = await userAuthService.loginByPassword(email, password);
   setCookieForSession(res, loginResult.sessionToken);
   res.status(200).json({loginResult});

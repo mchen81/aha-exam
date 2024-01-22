@@ -19,6 +19,11 @@ const LoginForm: React.FC = () => {
   const auth = useAuth();
 
   const onSubmit = async (data: FormValues): Promise<void> => {
+    if (data.email === '' || data.password === '') {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
     await auth.login(
       {
         email: data.email,
