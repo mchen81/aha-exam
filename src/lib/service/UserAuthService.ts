@@ -289,6 +289,7 @@ class UserAuthService {
    * When user makes a request, get user's data from the database.
    * @param sessionToken
    * @returns {Promise<UserAccountDataType>}
+   * @throws {ApplicationError} If the sessiopn token is invalid.
    */
   async getUserBySessionToken(
     sessionToken: string
@@ -371,6 +372,32 @@ class UserAuthService {
     await userAuth.save();
 
     return user;
+  }
+
+  /**
+   * verify if the session token is valid and active
+   * @param sessionToken
+   * @returns {Promise<void>}
+   * @throws {ApplicationError} If the sessiopn token is invalid.
+   */
+  async verifySessionToken(sessionToken: string): Promise<void> {
+    if (sessionToken === null || sessionToken === undefined) {
+      throw new ApplicationError(400, 'Session token is not provided');
+    }
+
+    const userSession = await UserSession.findOne({
+      where: {
+        sessionToken,
+      },
+    });
+
+    if (userSession === null) {
+      throw new ApplicationError(400, 'Session not found');
+    }
+
+    if (!userSession.isActive) {
+      throw new ApplicationError(400, 'Session is not active');
+    }
   }
 
   /**

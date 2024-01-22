@@ -4,10 +4,12 @@ import UserAccountService from '@/lib/service/UserAccountService';
 import ApplicationError from '@/lib/service/ApplicationError';
 
 import {getSessionTokenFromCookie} from '@/util/http';
+import UserAuthService from '@/lib/service/UserAuthService';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
 const userAccountService = UserAccountService.getInstance();
+const userAuthService = UserAuthService.getInstance();
 
 /**
  * @swagger
@@ -78,10 +80,13 @@ const userAccountService = UserAccountService.getInstance();
 
 router.get(async (req, res) => {
   const sessionToken = getSessionTokenFromCookie(req);
-  if (sessionToken === null) {
+  if (typeof sessionToken !== 'string') {
     res.status(401).json({error: 'Unauthorized'});
     return;
   }
+
+  await userAuthService.verifySessionToken(sessionToken);
+
   const dataType = req.query.dataType;
 
   if (dataType === 'userLoginInfo') {
