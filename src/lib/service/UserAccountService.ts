@@ -138,26 +138,63 @@ class UserAccountService {
     rollingDays: number,
     offset: number
   ): Promise<number> {
+    const utcOffset = `${offset <= 0 ? '+' : '-'}${Math.abs(offset)}:00`;
+
     const today = new Date();
     today.setHours(today.getHours() - offset, 0, 0, 0);
 
     const nDaysAgo = new Date(today);
     nDaysAgo.setDate(nDaysAgo.getDate() - rollingDays);
 
-    const reuslt: number = await UserSession.findAndCountAll({
-      distinct: true, // Count only unique users
+    /*
+      SELECT COUNT(DISTINCT(UserSession.user_id)) AS active_sessions,
+             DATE(CONVERT_TZ(UserSession.created_at, '+00:00', <utcOffset> )) AS session_date
+      FROM aha.user_session AS UserSession
+      WHERE UserSession.is_active = true
+        AND (UserSession.created_at >= CONVERT_TZ(NOW(), '+00:00', <utcOffset>) - INTERVAL <rollingDays-1> DAY
+        AND  UserSession.created_at <= CONVERT_TZ(NOW(), '+00:00', <utcOffset>))
+      GROUP BY session_date
+    */
+    const result = await UserSession.findAll({
+      attributes: [
+        [
+          sequelize.fn(
+            'COUNT',
+            sequelize.fn('DISTINCT', sequelize.col('user_id'))
+          ),
+          'active_sessions',
+        ],
+        [
+          sequelize.literal(
+            `DATE(CONVERT_TZ(created_at, '+00:00', '${utcOffset}'))`
+          ),
+          'session_date',
+        ],
+      ],
       where: {
         isActive: true,
         createdAt: {
-          [sequelize.Op.gte]: nDaysAgo,
-          [sequelize.Op.lte]: today,
+          [sequelize.Op.gte]: sequelize.literal(
+            `CONVERT_TZ(NOW(), '+00:00', '${utcOffset}') - INTERVAL ${
+              rollingDays - 1
+            } DAY`
+          ),
+          [sequelize.Op.lte]: sequelize.literal(
+            `CONVERT_TZ(NOW(), '+00:00', '${utcOffset}')`
+          ),
         },
       },
-    }).then(({count}) => {
-      return count;
+      group: ['session_date'],
     });
 
-    return reuslt / rollingDays;
+    const sumActiveSessions = result.reduce(
+      (sum, row) => sum + (row.get('active_sessions') as number),
+      0
+    );
+
+    const avgActiveSessions = sumActiveSessions / rollingDays;
+
+    return avgActiveSessions;
   }
 }
 
