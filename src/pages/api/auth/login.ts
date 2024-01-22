@@ -29,7 +29,7 @@ const userAuthService = UserAuthService.getInstance();
  *                 type: string
  *                 description: The user's password.
  *     responses:
- *       200:
+ *       '200':
  *         description: Successful login
  *         content:
  *           application/json:
@@ -40,19 +40,18 @@ const userAuthService = UserAuthService.getInstance();
  *             schema:
  *               type: string
  *               example: session_token=abcde12345; Path=/; HttpOnly
- *       400:
- *         description: email or password are not correct
+ *       '400':
+ *         description: Email or password are not correct
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/error-response'
- *       500:
+ *       '500':
  *         description: Internal Server Error
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/error-response'
- *
  */
 
 router.post(async (req, res) => {

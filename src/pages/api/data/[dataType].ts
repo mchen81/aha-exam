@@ -9,6 +9,73 @@ const router = createRouter<NextApiRequest, NextApiResponse>();
 
 const userAccountService = UserAccountService.getInstance();
 
+/**
+ * @swagger
+ * /api/data/userLoginInfo:
+ *   get:
+ *     tags:
+ *       - data
+ *     summary: Retrieve user login information for the Dashboard
+ *     description: Returns user signup timestamps, login counts, and last session timestamps for each user.
+ *     responses:
+ *       '200':
+ *         description: User's account information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/user-db-data'
+ *       '401':
+ *         description: Unauthorized user (with invalid session token)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
+ *       '500':
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
+ *
+ * /api/data/userStatistics:
+ *   get:
+ *     tags:
+ *       - data
+ *     summary: Retrieve user statistics data for the Dashboard
+ *     description: Returns timestamp of user sign up, number of times logged in, and timestamp of the last user session for each user.
+ *     parameters:
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         description: Timezone offset, default is -8 (UTC+8).
+ *     responses:
+ *       '200':
+ *         description: User's account statistics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/user-statistic'
+ *       '400':
+ *         description: The timezone offset is invalid.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
+ *       '401':
+ *         description: Unauthorized user (with invalid session token)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
+ *       '500':
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
+ */
+
 router.get(async (req, res) => {
   const sessionToken = getSessionTokenFromCookie(req);
   if (sessionToken === null) {
@@ -37,49 +104,11 @@ router.get(async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/data/userLoginInfo:
- *   get:
- *     tags:
- *       - data
- *     summary: The user db data for Dashboard
- *     description: Returns timestamp of user sign up, number of times logged in, iimestamp of the last user session for each user
- *     responses:
- *       200:
- *         description: User's account info
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/user-db-data'
- */
 async function processUserLoginInfo(res: NextApiResponse) {
   const userLoginInfo = await userAccountService.getAllUsersLoginInfo();
   res.status(200).json(userLoginInfo);
 }
 
-/**
- * @swagger
- * /api/data/userStatistics:
- *   get:
- *     tags:
- *       - data
- *     summary: The user statistics data for Dashboard
- *     description: Returns timestamp of user sign up, number of times logged in, iimestamp of the last user session for each user
- *     parameters:
- *       - in: query
- *         name: offset
- *         schema:
- *           type: integer
- *         description: timezone offset, default by -8 ( = UTC+8)
- *     responses:
- *       200:
- *         description: User's account info
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/user-statistic'
- */
 async function processUserStatistics(res: NextApiResponse, offset: number) {
   const userCountCall = userAccountService.getUserCount();
   const activeUserTodayCall = userAccountService.getActiveUserToday();

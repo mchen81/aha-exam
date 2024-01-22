@@ -18,14 +18,56 @@ const userAuthService = UserAuthService.getInstance();
  *   get:
  *     tags:
  *       - user
- *     description: Returns the hello world
+ *     description: Returns user's account information.
  *     responses:
- *       200:
+ *       '200':
  *         description: User's account info
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/user-account-info'
+ *       '401':
+ *         description: Unauthorized user (with invalid session token)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
+ *       '500':
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
+ *   put:
+ *     tags:
+ *       - user
+ *     summary: Update user name
+ *     description: Update user name
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: New username provided by the user
+ *     responses:
+ *       '200':
+ *         description: User's account info updated successfully (no response body)
+ *       '401':
+ *         description: Unauthorized user (with invalid session token)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
+ *       '500':
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
  */
 
 router.get(async (req, res) => {
@@ -41,29 +83,6 @@ router.get(async (req, res) => {
   res.status(200).json(result);
 });
 
-/**
- * @swagger
- * /api/user/me:
- *   put:
- *     tags:
- *       - user
- *     summary: Update user name
- *     description: update user name
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *                 description: New username what user's input
- *     responses:
- *       200:
- *         description:
- */
-
 router.put(async (req, res) => {
   const sessionToken = getSessionTokenFromCookie(req);
   if (sessionToken === null || _.isEmpty(sessionToken)) {
@@ -76,7 +95,7 @@ router.put(async (req, res) => {
   const user = await userAuthService.getUserBySessionToken(sessionToken);
   await userAccountService.updateUsername(user.email, username ?? '');
 
-  res.status(200).json({message: 'SUCCESS'});
+  res.status(200).json({});
 });
 
 export default router.handler({

@@ -16,29 +16,20 @@ const userAuthService = UserAuthService.getInstance();
  *     summary: Logout a user
  *     description: Use this endpoint to log out a user and invalidate their session.
  *     responses:
- *       200:
+ *       '200':
  *         description: User logged out successfully
- *       401:
+ *       '401':
  *         description: Unauthorized
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating unauthorized access.
- *       500:
+ *               $ref: '#/components/schemas/error-response'
+ *       '500':
  *         description: Internal Server Error
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating an internal server error.
- *
+ *               $ref: '#/components/schemas/error-response'
  */
 
 router.post(async (req, res) => {

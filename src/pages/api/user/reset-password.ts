@@ -14,16 +14,43 @@ const userAuthService = UserAuthService.getInstance();
  *   post:
  *     tags:
  *       - user
- *     description: Returns the hello world
+ *     summary: Reset User Password
+ *     description: Reset the user's password.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 description: The user's current password.
+ *               newPassword:
+ *                 type: string
+ *                 description: The user's new password.
  *     responses:
- *       200:
- *         description: User's account info
+ *       '200':
+ *         description: User's account info reset successfully (No response body).
+ *       '400':
+ *         description: Missing old or new passwordsm or the passwords doesn't not match.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/user-account-info'
+ *               $ref: '#/components/schemas/error-response'
+ *       '401':
+ *         description: Session token is invalid.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
+ *       '500':
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/error-response'
  */
-
 router.post(async (req, res) => {
   const sessionToken = getSessionTokenFromCookie(req);
   if (typeof sessionToken !== 'string') {

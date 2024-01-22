@@ -44,8 +44,8 @@ passport.use(
  *   get:
  *     tags:
  *       - auth
- *     summary: Google OAUTH
- *     description: Direct user to the google authentication page
+ *     summary: Direct user to the google authentication page
+ *     description: Note. You should not call invoke this endpoint directly through swagger
  *     responses:
  *       302:
  *         description: User logged out successfully
@@ -53,13 +53,12 @@ passport.use(
  *   get:
  *     tags:
  *       - auth
- *     summary: Google OAUTH callback
- *     description: OAuth 2.0 authorization with Google
+ *     summary: After google authentication, google side will invokes this endpoint
+ *     description: Note. You should not call invoke this endpoint directly through swagger
  *     responses:
  *       302:
  *         description: Redirect to dashboard
  */
-
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
 router.get((req, res, next) => {

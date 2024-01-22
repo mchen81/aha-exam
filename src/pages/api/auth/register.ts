@@ -15,7 +15,7 @@ const router = createRouter<NextApiRequest, NextApiResponse>();
  *     tags:
  *       - auth
  *     summary: Register a new user
- *     description: Use this endpoint to register a new user by providing email and password
+ *     description: Use this endpoint to register a new user by providing email and password.
  *     requestBody:
  *       required: true
  *       content:
@@ -30,29 +30,20 @@ const router = createRouter<NextApiRequest, NextApiResponse>();
  *                 type: string
  *                 description: The user's password.
  *     responses:
- *       200:
+ *       '200':
  *         description: User registered successfully
- *       400:
+ *       '400':
  *         description: Bad Request
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating a bad request, e.g., invalid input.
- *       500:
+ *               $ref: '#/components/schemas/error-response'
+ *       '500':
  *         description: Internal Server Error
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating an internal server error.
- *
+ *               $ref: '#/components/schemas/error-response'
  */
 
 router.post(async (req, res) => {
