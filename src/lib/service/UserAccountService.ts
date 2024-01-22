@@ -6,6 +6,10 @@ import _ from 'lodash';
 
 let instance: UserAccountService;
 
+function toUtcOffset(offset: number): string {
+  return `${offset <= 0 ? '+' : '-'}${Math.abs(offset)}:00`;
+}
+
 class UserAccountService {
   static getInstance(): UserAccountService {
     if (instance === undefined) {
@@ -14,6 +18,12 @@ class UserAccountService {
     return instance;
   }
 
+  /**
+   * Get user's data by email
+   * @param email user email
+   * @returns User's account info or null if not found
+   * @throws {ApplicationError} If the user doesn't have a session, which should be considered as a bug
+   */
   async getUserByEmail(email: string): Promise<UserAccountDataType | null> {
     const user = await UserAccount.findOne({
       where: {
@@ -66,11 +76,15 @@ class UserAccountService {
     };
   }
 
+  /**
+   * Update user's name
+   * @param email user's identifier
+   * @param username new username
+   * @returns new user's name
+   * @throws {ApplicationError} If the user not found
+   *
+   */
   async updateUsername(email: string, username: string): Promise<string> {
-    if (_.isEmpty(username)) {
-      throw new ApplicationError(400, 'User name cannot be empty');
-    }
-
     const user = await UserAccount.findOne({
       where: {
         email,
@@ -81,12 +95,16 @@ class UserAccountService {
       throw new ApplicationError(404, 'User not found');
     }
 
-    user.username = username;
+    user.username = username ?? '';
     await user.save();
 
     return username;
   }
 
+  /**
+   * Get all users' LoginInfo
+   * @returns {Promise<LoginInfo[]>}}
+   */
   async getAllUsersLoginInfo(): Promise<LoginInfo[]> {
     const result = (await UserAccount.findAll({
       attributes: [
@@ -112,11 +130,19 @@ class UserAccountService {
     return result as LoginInfo[];
   }
 
+  /**
+   * Get the total number of users
+   * @returns {number} the count of all users
+   */
   async getUserCount(): Promise<number> {
     const reuslt = await UserAccount.count();
     return reuslt;
   }
 
+  /**
+   * Get all active user by today (with given offset)
+   * @returns
+   */
   async getActiveUserToday(): Promise<number> {
     return await UserSession.findAndCountAll({
       distinct: true,
@@ -138,7 +164,7 @@ class UserAccountService {
     rollingDays: number,
     offset: number
   ): Promise<number> {
-    const utcOffset = `${offset <= 0 ? '+' : '-'}${Math.abs(offset)}:00`;
+    const utcOffset = toUtcOffset(offset);
 
     const today = new Date();
     today.setHours(today.getHours() - offset, 0, 0, 0);

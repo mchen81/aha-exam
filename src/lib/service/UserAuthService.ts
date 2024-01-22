@@ -26,6 +26,14 @@ class UserAuthService {
     return instance;
   }
 
+  /**
+   * Register a new user by email and password.
+   *
+   * @param {string} email - The email of the user.
+   * @param {string} password - The password of the user.
+   * @returns {Promise<void>}
+   * @throws {ApplicationError} If the email is invalid, the password does not meet the requirements, or the user already exists.
+   */
   async registerUserByPassword(email: string, password: string): Promise<void> {
     if (!isValidEmail(email)) {
       throw new ApplicationError(400, 'Invalid Email');
@@ -74,6 +82,12 @@ class UserAuthService {
     });
   }
 
+  /**
+   * Create or fina a user by google oauth2 profile.
+   * @param {GoogleAuthProfile} profile extraced from google oauth2
+   * @returns {Promise<LoginResult>}
+   * @throws {ApplicationError} If use has been registered with password before
+   */
   async registerOrLoginUserByGoogle(
     profile: GoogleAuthProfile
   ): Promise<LoginResult> {
@@ -145,6 +159,13 @@ class UserAuthService {
     };
   }
 
+  /**
+   * User login with email and password.
+   * @param email
+   * @param password
+   * @returns {Promise<LoginResult>}
+   * @throws {ApplicationError} If the given user credentials are invalid.
+   */
   async loginByPassword(email: string, password: string): Promise<LoginResult> {
     const user = await UserAccount.findOne({
       where: {
@@ -194,6 +215,11 @@ class UserAuthService {
     };
   }
 
+  /**
+   * Deactivate the geven session
+   * @param sessionToken
+   * @throws {ApplicationError} If the sessiopn token is invalid.
+   */
   async logoutUser(sessionToken: string): Promise<void> {
     const userSession = await UserSession.findOne({
       where: {
@@ -209,6 +235,13 @@ class UserAuthService {
     await userSession.save();
   }
 
+  /**
+   * Reset user's password
+   * @param email
+   * @param oldPassword
+   * @param newPassword
+   * @throws {ApplicationError} If the given user credentials are invalid.
+   */
   async resetPassword(
     email: string,
     oldPassword: string,
@@ -252,6 +285,11 @@ class UserAuthService {
     await userAuth.save();
   }
 
+  /**
+   * When user makes a request, get user's data from the database.
+   * @param sessionToken
+   * @returns {Promise<UserAccountDataType>}
+   */
   async getUserBySessionToken(
     sessionToken: string
   ): Promise<UserAccountDataType> {
@@ -298,6 +336,12 @@ class UserAuthService {
     };
   }
 
+  /**
+   * turn the user's isVerified flag to true
+   * @param email
+   * @returns {Promise<UserAccount>}
+   * @throws {ApplicationError} when user not found
+   */
   async verifyUserEmail(email: string): Promise<UserAccount> {
     const user = await UserAccount.findOne({
       where: {
@@ -329,6 +373,11 @@ class UserAuthService {
     return user;
   }
 
+  /**
+   * This method is used when user clicks the verfiy link through email, a session is issued so that the user does not have to login again.
+   * @param userId user's databse id
+   * @returns {string} session token
+   */
   async createSessionForAuthenticatedUser(userId: number): Promise<string> {
     const sessionToken = generationSessionToken();
 
