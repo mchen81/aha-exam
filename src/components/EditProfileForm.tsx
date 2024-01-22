@@ -11,7 +11,6 @@ import Button from '@mui/material/Button';
 
 import axios from 'axios';
 import {toast} from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 import {useAuth} from '@/hooks/useAuth';
 
