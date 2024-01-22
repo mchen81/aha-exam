@@ -117,36 +117,31 @@ class UserAccountService {
     return reuslt;
   }
 
-  async getActiveUserInDay() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
+  async getActiveUserToday() {
     return await UserSession.findAndCountAll({
-      distinct: true, // Count only unique users
+      distinct: true,
       where: {
         isActive: true,
-        createdAt: {
-          [sequelize.Op.gte]: today, // Sessions created today
-        },
       },
-    })
-      .then(({count}) => {
-        return count;
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+    }).then(({count}) => {
+      return count;
+    });
   }
 
-  async getAverageActiveSessionUsers(rollingDays: number = 7) {
-    const sevenDaysAgo = new Date();
+  async getAverageActiveSessionUsers(rollingDays: number, offset: number) {
+    const today = new Date();
+    today.setHours(today.getHours() - offset, 0, 0, 0);
+
+    const sevenDaysAgo = new Date(today);
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - rollingDays);
+
     const reuslt: number = await UserSession.findAndCountAll({
       distinct: true, // Count only unique users
       where: {
         isActive: true,
         createdAt: {
-          [sequelize.Op.gte]: sevenDaysAgo, // Sessions created in the last 7 days
+          [sequelize.Op.gte]: sevenDaysAgo,
+          [sequelize.Op.lte]: today,
         },
       },
     }).then(({count}) => {

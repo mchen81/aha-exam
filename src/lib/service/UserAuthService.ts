@@ -15,7 +15,6 @@ interface GoogleAuthProfile {
 }
 
 const SALT_ROUND = 10;
-const SESSION_EXPIRE = 1000 * 60 * 60 * 24 * 30; // 30D
 
 let instance: UserAuthService;
 
@@ -126,7 +125,6 @@ class UserAuthService {
       userId: user.id,
       sessionToken,
       isActive: true,
-      expireAt: new Date(Date.now() + SESSION_EXPIRE),
       createdAt: new Date(),
     });
 
@@ -176,7 +174,6 @@ class UserAuthService {
       userId: user.id,
       sessionToken,
       isActive: true,
-      expireAt: new Date(Date.now() + SESSION_EXPIRE),
       createdAt: new Date(),
     });
 
@@ -264,10 +261,6 @@ class UserAuthService {
 
     if (!userSession.isActive) {
       throw new ApplicationError(400, 'Session is not active');
-    }
-
-    if (userSession.expireAt <= new Date()) {
-      throw new ApplicationError(400, 'Session has expired');
     }
 
     const user = await UserAccount.findOne({

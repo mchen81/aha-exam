@@ -44,7 +44,6 @@ export class UserSession extends Model<
   declare userId: ForeignKey<number>;
   declare sessionToken: string;
   declare isActive: boolean;
-  declare expireAt: Date;
   declare createdAt: Date;
 }
 
@@ -154,10 +153,6 @@ UserSession.init(
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
-    },
-    expireAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
     },
     createdAt: {
       type: DataTypes.DATE,
