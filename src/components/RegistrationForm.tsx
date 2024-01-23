@@ -4,7 +4,8 @@
 
 import React from 'react';
 import {useForm, Controller} from 'react-hook-form';
-import {TextField, Button, Grid} from '@mui/material';
+import {TextField, Button, Grid, Stack} from '@mui/material';
+import Link from 'next/link';
 import {yupResolver} from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import _ from 'lodash';
@@ -116,9 +117,15 @@ const RegistrationForm: React.FC = () => {
           />
         </Grid>
         <Grid item xs={12}>
-          <Button type="submit" variant="contained" color="primary">
-            Register
-          </Button>
+          <Stack direction={'row'} spacing={2}>
+            <Button type="submit" variant="contained" color="primary">
+              Register
+            </Button>
+
+            <Link href="/api/auth/google/auth">
+              <Button variant="contained">Google Sign Up</Button>
+            </Link>
+          </Stack>
         </Grid>
       </Grid>
     </form>
