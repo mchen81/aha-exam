@@ -81,7 +81,7 @@ const ResetPasswordForm = (props: Props) => {
               <TextField
                 {...field}
                 type="password"
-                label="oldPassword"
+                label="Old Password"
                 variant="outlined"
                 fullWidth
                 error={!_.isEmpty(errors.oldPassword)}
