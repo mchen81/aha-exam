@@ -45,7 +45,7 @@ passport.use(
  *     tags:
  *       - auth
  *     summary: Direct user to the google authentication page
- *     description: Note. You should not call invoke this endpoint directly through swagger
+ *     description: Note You should not invoke this endpoint directly through swagger
  *     responses:
  *       302:
  *         description: User logged out successfully
@@ -54,7 +54,7 @@ passport.use(
  *     tags:
  *       - auth
  *     summary: After google authentication, google side will invokes this endpoint
- *     description: Note. You should not call invoke this endpoint directly through swagger
+ *     description: Note You should not invoke this endpoint directly through swagger
  *     responses:
  *       302:
  *         description: Redirect to dashboard
