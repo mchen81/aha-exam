@@ -98,9 +98,6 @@ const AuthProvider = ({children}: Props): React.JSX.Element => {
         .then(async response => {
           const user: UserAccountDataType = response.data;
           setUser(user);
-          if (!user.isVerified) {
-            router.push(pageUrl.waitVerify);
-          }
         })
         .catch(() => {
           localStorage.removeItem(LOCAL_STORAGE_KEY.user);
