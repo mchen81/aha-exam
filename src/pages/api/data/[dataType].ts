@@ -18,7 +18,7 @@ const userAuthService = UserAuthService.getInstance();
  *     tags:
  *       - data
  *     summary: Retrieve user login information for the Dashboard
- *     description: Returns user signup timestamps, login counts, and last session timestamps for each user.
+ *     description: Returns user signup timestamps, login counts, and last session timestamps for each user. The timestamp data are in UTC+0 timezone, you will need to tranform it to your time zone.
  *     responses:
  *       '200':
  *         description: User's account information
@@ -44,7 +44,7 @@ const userAuthService = UserAuthService.getInstance();
  *     tags:
  *       - data
  *     summary: Retrieve user statistics data for the Dashboard
- *     description: Returns timestamp of user sign up, number of times logged in, and timestamp of the last user session for each user.
+ *     description: Returns user count, active user today, average active session users, the result may be different for different timezones(offset).
  *     parameters:
  *       - in: query
  *         name: offset
