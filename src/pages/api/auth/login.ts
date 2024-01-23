@@ -57,7 +57,7 @@ const userAuthService = UserAuthService.getInstance();
 
 router.post(async (req, res) => {
   const {email, password} = req.body;
-  if (isValidEmail(email) || isValidPassword(password)) {
+  if (!isValidEmail(email) || !isValidPassword(password)) {
     res.status(400).json({error: 'Invalid email or password'});
     return;
   }
