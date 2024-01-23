@@ -174,9 +174,6 @@ class UserAuthService {
       include: [
         {
           model: UserAuthentication,
-          where: {
-            provider: 'local',
-          },
           required: true,
         },
       ],
@@ -187,6 +184,18 @@ class UserAuthService {
     }
 
     const userAuth: UserAuthentication = user.UserAuthentications[0];
+    if (userAuth.provider === 'google') {
+      throw new ApplicationError(
+        400,
+        'This user is only allowed to login with google account'
+      );
+    } else if (userAuth.provider !== 'local') {
+      throw new ApplicationError(
+        400,
+        'This user has a unknown authentication provider'
+      );
+    }
+
     const isMatched: boolean = bcrypt.compareSync(
       password,
       userAuth.authentication
