@@ -64,7 +64,7 @@ router.post(async (req, res) => {
 
   const loginResult = await userAuthService.loginByPassword(email, password);
   setCookieForSession(res, loginResult.sessionToken);
-  res.status(200).json({loginResult});
+  res.status(200).json(loginResult);
 });
 
 export default router.handler({
